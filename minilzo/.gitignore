@@ -1,0 +1,9 @@
+﻿# http://www.oberhumer.com/opensource/lzo/
+COPYING
+lzoconf.h
+lzodefs.h
+Makefile
+minilzo.c
+minilzo.h
+README.LZO
+testmini.c

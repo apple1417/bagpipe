@@ -4,10 +4,36 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
+    <Platforms>x86</Platforms>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Debug\**" />
+    <Compile Remove="minilzo\**" />
+    <Compile Remove="Release\**" />
+    <EmbeddedResource Remove="Debug\**" />
+    <EmbeddedResource Remove="minilzo\**" />
+    <EmbeddedResource Remove="Release\**" />
+    <None Remove="Debug\**" />
+    <None Remove="minilzo\**" />
+    <None Remove="Release\**" />
+    <Page Remove="Debug\**" />
+    <Page Remove="minilzo\**" />
+    <Page Remove="Release\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MahApps.Metro" Version="2.4.7" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="minilzo\minilzo.vcxproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy $(SolutionDir)$(ConfigurationName)\minilzo.dll $(TargetDir)\minilzo.dll" />
+  </Target>
 
 </Project>

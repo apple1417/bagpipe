@@ -1,0 +1,5 @@
+LIBRARY minilzo
+EXPORTS
+   lzo1x_1_compress @1
+   lzo1x_decompress @2
+   lzo1x_decompress_safe @3
