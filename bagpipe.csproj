@@ -32,8 +32,4 @@
     </ProjectReference>
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy $(SolutionDir)$(ConfigurationName)\minilzo.dll $(TargetDir)\minilzo.dll" />
-  </Target>
-
 </Project>
