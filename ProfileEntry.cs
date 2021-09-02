@@ -15,7 +15,7 @@ namespace bagpipe {
   }
 
   class ProfileEntryViewModel {
-    private ProfileEntry entry;
+    private readonly ProfileEntry entry;
     public ProfileEntryViewModel(ProfileEntry entry) {
       this.entry = entry;
     }
@@ -23,12 +23,6 @@ namespace bagpipe {
     public string ID {
       get {
         return $"Unknown ID {entry.ID}";
-      }
-    }
-
-    public SettingsDataType Type {
-      get {
-        return entry.Type;
       }
     }
 

@@ -38,7 +38,7 @@
                                ParsingNumberStyle="Number" />
         </DataTemplate>
         <DataTemplate x:Key="StringSettingsTemplate">
-            <TextBox Text="{Binding Path=Value}" />
+            <TextBox Text="{Binding Value}" />
         </DataTemplate>
         <DataTemplate x:Key="FloatSettingsTemplate">
             <mah:NumericUpDown Minimum="-3.40282347E+38"

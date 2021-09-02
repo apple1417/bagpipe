@@ -13,18 +13,19 @@ using System.Windows.Shapes;
 using MahApps.Metro.Controls;
 using System.Globalization;
 using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace bagpipe {
   /// <summary>
   /// Interaction logic for MainWindow.xaml
   /// </summary>
   public partial class MainWindow : MetroWindow {
-    private List<ProfileEntry> entries;
+    private ObservableCollection<ProfileEntry> entries;
 
     public MainWindow() {
       InitializeComponent();
 
-      entries = new List<ProfileEntry>() {
+      entries = new ObservableCollection<ProfileEntry>() {
         new ProfileEntry() {
           Owner = OnlineProfilePropertyOwner.None,
           ID = 123,
@@ -48,7 +49,7 @@ namespace bagpipe {
         }
       };
 
-      DataContext = entries.Select(x => new ProfileEntryViewModel(x));
+      DataContext = new ViewModelObservableCollection<ProfileEntryViewModel, ProfileEntry>(entries, x => new ProfileEntryViewModel(x));
     }
   }
 }
