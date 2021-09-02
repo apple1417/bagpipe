@@ -22,8 +22,7 @@ namespace bagpipe {
         double _ => elem.FindResource("DoubleSettingsTemplate") as DataTemplate,
         string _ => elem.FindResource("StringSettingsTemplate") as DataTemplate,
         float _ => elem.FindResource("FloatSettingsTemplate") as DataTemplate,
-        // TODO
-        // byte[] _ => elem.FindResource("BlobSettingsTemplate") as DataTemplate,
+        byte[] _ => elem.FindResource("BlobSettingsTemplate") as DataTemplate,
         DateTime _ => elem.FindResource("DateTimeSettingsTemplate") as DataTemplate,
         byte _ => elem.FindResource("ByteSettingsTemplate") as DataTemplate,
         _ => throw new ApplicationException(),

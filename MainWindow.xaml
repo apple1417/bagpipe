@@ -14,7 +14,7 @@
         <local:FloatSettingConverter x:Key="FloatSettingConverter"/>
         <local:ByteSettingConverter x:Key="ByteSettingConverter"/>
         <local:SettingsTypeTemplateSelector x:Key="SettingsTypeTemplateSelector" />
-        
+
         <DataTemplate x:Key="EmptySettingsTemplate">
             <TextBlock>Empty</TextBlock>
         </DataTemplate>
@@ -47,6 +47,10 @@
                                NumericInputMode="Decimal"
                                ParsingNumberStyle="Number" />
         </DataTemplate>
+        <DataTemplate x:Key="BlobSettingsTemplate">
+            <!-- TODO -->
+            <TextBlock>- binary data -</TextBlock>
+        </DataTemplate>
         <DataTemplate x:Key="DateTimeSettingsTemplate">
             <!-- TODO: this probably needs a converter -->
             <mah:DateTimePicker DisplayDate="{Binding Value}" />
@@ -61,9 +65,9 @@
     </Window.Resources>
 
     <Grid>
-        <mah:MetroAnimatedTabControl>
-            <TabItem Header="Raw">
-                <ListView ItemsSource="{Binding}">
+        <mah:MetroAnimatedTabControl Margin="0,0,0,42">
+            <TabItem Header="RAW" mah:ControlsHelper.ContentCharacterCasing="Upper">
+                <ListView ItemsSource="{Binding}" Margin="0,0,0,0">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="ID"
@@ -74,12 +78,8 @@
                     </ListView.View>
                 </ListView>
             </TabItem>
-            <TabItem Header="tmp">
-                <Grid>
-                    <mah:NumericUpDown Minimum="0" Maximum="100" Value="50" ParsingNumberStyle="Integer" NumericInputMode="Decimal"/>
-                    
-                </Grid>
-            </TabItem>
         </mah:MetroAnimatedTabControl>
+        <Button Content="SAVE" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="SaveButton_Click"/>
+        <Button Content="OPEN" Margin="0,0,51,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="OpenButton_Click"/>
     </Grid>
 </mah:MetroWindow>

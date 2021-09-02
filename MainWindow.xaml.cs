@@ -14,42 +14,46 @@ using MahApps.Metro.Controls;
 using System.Globalization;
 using System.Linq;
 using System.Collections.ObjectModel;
+using Microsoft.Win32;
 
 namespace bagpipe {
   /// <summary>
   /// Interaction logic for MainWindow.xaml
   /// </summary>
   public partial class MainWindow : MetroWindow {
-    private ObservableCollection<ProfileEntry> entries;
+    private Profile profile;
+
+    private OpenFileDialog fileDialog = new OpenFileDialog() {
+      Filter = "Profile File|profile.bin;Player.wsg"
+    };
 
     public MainWindow() {
       InitializeComponent();
 
-      entries = new ObservableCollection<ProfileEntry>() {
-        new ProfileEntry() {
+      profile = new Profile();
+      for (int i = 0; i <= 50; i++) {
+        profile.Add(new ProfileEntry() {
           Owner = OnlineProfilePropertyOwner.None,
           ID = 123,
           Type = SettingsDataType.String,
           Value = "test",
           AdvertisementType = OnlineDataAdvertisementType.DontAdvertise
-        },
-        new ProfileEntry() {
-          Owner = OnlineProfilePropertyOwner.None,
-          ID = 456,
-          Type = SettingsDataType.Int32,
-          Value = 1234,
-          AdvertisementType = OnlineDataAdvertisementType.DontAdvertise
-        },
-        new ProfileEntry() {
-          Owner = OnlineProfilePropertyOwner.None,
-          ID = 456,
-          Type = SettingsDataType.Double,
-          Value = 1234.3,
-          AdvertisementType = OnlineDataAdvertisementType.DontAdvertise
-        }
-      };
+        });
+      }
 
-      DataContext = new ViewModelObservableCollection<ProfileEntryViewModel, ProfileEntry>(entries, x => new ProfileEntryViewModel(x));
+      DataContext = new ViewModelObservableCollection<ProfileEntryViewModel, ProfileEntry>(profile, x => new ProfileEntryViewModel(x));
+    }
+
+    private void OpenButton_Click(object sender, RoutedEventArgs e) {
+      bool? ok = fileDialog.ShowDialog();
+      if (ok.HasValue && ok.Value) {
+        profile.LoadProfile(fileDialog.FileName);
+        // TODO: warnings
+      }
+    }
+
+    private void SaveButton_Click(object sender, RoutedEventArgs e) {
+      // TODO
     }
   }
 }

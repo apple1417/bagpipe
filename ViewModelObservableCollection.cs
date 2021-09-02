@@ -58,7 +58,9 @@ namespace bagpipe {
         }
         case NotifyCollectionChangedAction.Reset: {
           Clear();
-          AddNewItems();
+          if (e.NewItems != null) {
+            AddNewItems();
+          }
           break;
         }
 
