@@ -9,8 +9,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-
 using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using System.Globalization;
 using System.Linq;
 using System.Collections.ObjectModel;
@@ -47,8 +47,13 @@ namespace bagpipe {
     private void OpenButton_Click(object sender, RoutedEventArgs e) {
       bool? ok = fileDialog.ShowDialog();
       if (ok.HasValue && ok.Value) {
-        profile.LoadProfile(fileDialog.FileName);
-        // TODO: warnings
+        bool warn = profile.LoadProfile(fileDialog.FileName);
+        if (warn) {
+          _ = this.ShowMessageAsync(
+            "Warning",
+            "Unexpected data was encountered while loading the profile. This may have caused some values to be intepreted incorrectly."
+          );
+        }
       }
     }
 

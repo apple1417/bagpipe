@@ -18,5 +18,13 @@ namespace bagpipe {
       }
       return (byte)val;
     }
+
+    public static void SeekSafe(this Stream stream, long offset, SeekOrigin origin) {
+      long oldPos = stream.Position;
+      long newPos = stream.Seek(offset, origin);
+      if (newPos != oldPos + offset) {
+        throw new EndOfStreamException();
+      }
+    }
   }
 }

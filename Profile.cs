@@ -7,47 +7,45 @@ using System.IO;
 using System.Text;
 
 namespace bagpipe {
-  [Flags]
-  enum LoadProfileResult {
-    OK = 0,
-    Assumed = 0b01,
-    Unknown = 0b10
-  };
-
   class Profile : ObservableCollection<ProfileEntry> {
-    public LoadProfileResult LoadProfile(string path) {
+    public bool LoadProfile(string path) {
       Clear();
 
       byte[] decompressedData;
 
       using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read)) {
-        long pos = fs.Seek(20, SeekOrigin.Begin);
-        if (pos != 20) {
-          throw new EndOfStreamException();
-        }
+        fs.SeekSafe(20, SeekOrigin.Begin);
 
         // Don't really know if this is signed or not, but it should never practically matter
-        uint size = BinaryPrimitives.ReadUInt32BigEndian(fs.ReadByteArray(4));
+        int size = BinaryPrimitives.ReadInt32BigEndian(fs.ReadByteArray(4));
 
         using (MemoryStream ms = new MemoryStream()) {
           fs.CopyTo(ms);
           try {
-            decompressedData = LZO.Decompress(ms.ToArray(), (int)size);
+            decompressedData = LZO.Decompress(size, ms.GetBuffer(), 0, (int)ms.Length);
           } catch (Win32Exception ex) {
             throw new IOException(ex.Message, ex);
           }
         }
       }
 
-      LoadProfileResult res = LoadProfileResult.OK;
+      bool warning = false;
 
       using (MemoryStream ms = new MemoryStream(decompressedData)) {
-        while (ms.Position < decompressedData.Length) {
+        int entryCount = BinaryPrimitives.ReadInt32BigEndian(ms.ReadByteArray(4));
+
+        for (int i = 0; i < entryCount; i++) {
           ProfileEntry entry = new ProfileEntry();
 
-          // Again don't really know if these are signed or not
           entry.Owner = (OnlineProfilePropertyOwner)ms.ReadByteSafe();
-          entry.ID = BinaryPrimitives.ReadUInt32BigEndian(ms.ReadByteArray(4));
+          if (
+            entry.Owner != OnlineProfilePropertyOwner.Game
+            || entry.Owner != OnlineProfilePropertyOwner.OnlineService
+          ) {
+            warning = true;
+          }
+
+          entry.ID = BinaryPrimitives.ReadInt32BigEndian(ms.ReadByteArray(4));
           entry.Type = (SettingsDataType)ms.ReadByteSafe();
 
           switch (entry.Type) {
@@ -76,34 +74,41 @@ namespace bagpipe {
               break;
             }
             case SettingsDataType.Empty: {
-              res |= LoadProfileResult.Assumed;
+              warning = true;
               break;
             }
             case SettingsDataType.Int64: {
-              res |= LoadProfileResult.Assumed;
+              warning = true;
               entry.Value = BinaryPrimitives.ReadInt64BigEndian(ms.ReadByteArray(8));
               break;
             }
             case SettingsDataType.Double: {
-              res |= LoadProfileResult.Assumed;
+              warning = true;
               entry.Value = BitConverter.Int64BitsToDouble(
                 BinaryPrimitives.ReadInt64BigEndian(ms.ReadByteArray(8))
               );
               break;
             }
             default: {
-              res |= LoadProfileResult.Unknown;
+              warning = true;
               break;
             }
           }
 
-          entry.Owner = (OnlineProfilePropertyOwner)ms.ReadByteSafe();
+          entry.AdvertisementType = (OnlineDataAdvertisementType)ms.ReadByteSafe();
+          if (entry.AdvertisementType != OnlineDataAdvertisementType.DontAdvertise) {
+            warning = true;
+          }
 
           Add(entry);
         }
+
+        if (ms.Position != ms.Length) {
+          warning = true;
+        }
       }
 
-      return res;
+      return warning;
     }
 
     public void SaveProfile() {

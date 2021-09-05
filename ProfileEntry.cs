@@ -7,10 +7,32 @@ using System.Text;
 namespace bagpipe {
   class ProfileEntry {
     public OnlineProfilePropertyOwner Owner;
-    public uint ID;
-    // TODO: Validate Type
+    public int ID;
     public SettingsDataType Type;
-    public object Value;
+
+    private object _value;
+    public object Value {
+      get => _value;
+      set {
+        if (Type switch {
+          SettingsDataType.Empty => value is null,
+          SettingsDataType.Int32 => value is int,
+          SettingsDataType.Int64 => value is long,
+          SettingsDataType.Double => value is double,
+          SettingsDataType.String => value is string,
+          SettingsDataType.Float => value is float,
+          SettingsDataType.Blob => value is byte[],
+          SettingsDataType.DateTime => value is DateTime,
+          SettingsDataType.Byte => value is byte,
+          _ => false,
+        }) {
+          _value = value;
+        } else {
+          throw new ArgumentException($"Tried to set invalid type {value.GetType().Name} for type field {Type}");
+        }
+      }
+    }
+
     public OnlineDataAdvertisementType AdvertisementType;
   }
 
@@ -27,13 +49,8 @@ namespace bagpipe {
     }
 
     public object Value {
-      get {
-        return entry.Value;
-      }
-      set {
-        // TODO: validate type
-        entry.Value = value;
-      }
+      get => entry.Value;
+      set => entry.Value = value;
     }
   }
 }

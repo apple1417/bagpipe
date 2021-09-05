@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace bagpipe {
   enum OnlineProfilePropertyOwner {
@@ -24,21 +25,5 @@ namespace bagpipe {
     OnlineService = 1,
     QOS = 2,
     OnlineServiceAndQOS = 3,
-  }
-
-  static class EnumExtensions {
-    public static Type GetAssociatedType(this SettingsDataType dataType) {
-      switch (dataType) {
-        case SettingsDataType.Int32: return typeof(int);
-        case SettingsDataType.Int64: return typeof(long);
-        case SettingsDataType.Double: return typeof(double);
-        case SettingsDataType.String: return typeof(string);
-        case SettingsDataType.Float: return typeof(float);
-        case SettingsDataType.Blob: return typeof(byte[]);
-        case SettingsDataType.DateTime: return typeof(DateTime);
-        case SettingsDataType.Byte: return typeof(byte);
-        default: return null;
-      }
-    }
   }
 }
