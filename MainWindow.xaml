@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:bagpipe"
         mc:Ignorable="d"
         Title="Bagpipe" Height="500" Width="400" MinWidth="300" MinHeight="400">
@@ -62,16 +63,22 @@
                                NumericInputMode="Numbers"
                                ParsingNumberStyle="Integer,AllowThousands" />
         </DataTemplate>
+
+        <ObjectDataProvider x:Key="GameValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:Game"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
     </Window.Resources>
 
     <Grid>
         <mah:MetroAnimatedTabControl Margin="0,0,0,42">
             <TabItem Header="RAW" mah:ControlsHelper.ContentCharacterCasing="Upper">
-                <ListView ItemsSource="{Binding}" Margin="0,0,0,0">
+                <ListView ItemsSource="{Binding Entries}" Margin="0,0,0,0">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="ID"
-                                            DisplayMemberBinding="{Binding ID}" />
+                            <GridViewColumn Header="Name"
+                                            DisplayMemberBinding="{Binding Name}" />
                             <GridViewColumn Header="Value"
                                             CellTemplateSelector="{StaticResource SettingsTypeTemplateSelector}"/>
                         </GridView>
@@ -79,7 +86,22 @@
                 </ListView>
             </TabItem>
         </mah:MetroAnimatedTabControl>
-        <Button Content="SAVE" Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="SaveButton_Click"/>
-        <Button Content="OPEN" Margin="0,0,51,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="OpenButton_Click"/>
+        <!-- TODO: updates -->
+        <ComboBox Margin="10,0,0,10"
+                  Height="27.3" Width="64"
+                  HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                  ItemsSource="{Binding Source={StaticResource GameValues}}"
+                  SelectedValue="{Binding DisplayGame}" />
+        <Button Content="SAVE"
+                Margin="0,0,10,10"
+                Height="27.3"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                Click="SaveButton_Click" />
+        <Button Content="OPEN"
+                Margin="0,0,51,10"
+                Height="27.3"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Click="OpenButton_Click" />
     </Grid>
 </mah:MetroWindow>

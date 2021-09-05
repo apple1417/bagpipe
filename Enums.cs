@@ -26,4 +26,11 @@ namespace bagpipe {
     QOS = 2,
     OnlineServiceAndQOS = 3,
   }
+
+  enum Game {
+    BL1,
+    BL1E,
+    BL2,
+    TPS
+  }
 }

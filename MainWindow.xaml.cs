@@ -21,9 +21,9 @@ namespace bagpipe {
   /// Interaction logic for MainWindow.xaml
   /// </summary>
   public partial class MainWindow : MetroWindow {
-    private Profile profile;
+    private readonly Profile profile;
 
-    private OpenFileDialog fileDialog = new OpenFileDialog() {
+    private readonly OpenFileDialog fileDialog = new OpenFileDialog() {
       Filter = "Profile File|profile.bin;Player.wsg"
     };
 
@@ -31,23 +31,13 @@ namespace bagpipe {
       InitializeComponent();
 
       profile = new Profile();
-      for (int i = 0; i <= 50; i++) {
-        profile.Add(new ProfileEntry() {
-          Owner = OnlineProfilePropertyOwner.None,
-          ID = 123,
-          Type = SettingsDataType.String,
-          Value = "test",
-          AdvertisementType = OnlineDataAdvertisementType.DontAdvertise
-        });
-      }
-
-      DataContext = new ViewModelObservableCollection<ProfileEntryViewModel, ProfileEntry>(profile, x => new ProfileEntryViewModel(x));
+      DataContext = new ProfileViewModel(profile);
     }
 
     private void OpenButton_Click(object sender, RoutedEventArgs e) {
       bool? ok = fileDialog.ShowDialog();
       if (ok.HasValue && ok.Value) {
-        bool warn = profile.LoadProfile(fileDialog.FileName);
+        bool warn = profile.Load(fileDialog.FileName);
         if (warn) {
           _ = this.ShowMessageAsync(
             "Warning",

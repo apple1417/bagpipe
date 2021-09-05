@@ -7,9 +7,45 @@ using System.IO;
 using System.Text;
 
 namespace bagpipe {
-  class Profile : ObservableCollection<ProfileEntry> {
-    public bool LoadProfile(string path) {
-      Clear();
+  class ProfileEntry {
+    public OnlineProfilePropertyOwner Owner;
+    public int ID;
+    public SettingsDataType Type;
+
+    private object _value;
+    public object Value {
+      get => _value;
+      set {
+        if (Type switch {
+          SettingsDataType.Empty => value is null,
+          SettingsDataType.Int32 => value is int,
+          SettingsDataType.Int64 => value is long,
+          SettingsDataType.Double => value is double,
+          SettingsDataType.String => value is string,
+          SettingsDataType.Float => value is float,
+          SettingsDataType.Blob => value is byte[],
+          SettingsDataType.DateTime => value is DateTime,
+          SettingsDataType.Byte => value is byte,
+          _ => false,
+        }) {
+          _value = value;
+        } else {
+          throw new ArgumentException($"Tried to set invalid type {value.GetType().Name} for type field {Type}");
+        }
+      }
+    }
+
+    public OnlineDataAdvertisementType AdvertisementType;
+  }
+
+  class Profile {
+    public event EventHandler ProfileLoaded;
+
+    public string ProfilePath;
+    public ObservableCollection<ProfileEntry> Entries = new ObservableCollection<ProfileEntry>();
+
+    public bool Load(string path) {
+      Entries.Clear();
 
       byte[] decompressedData;
 
@@ -40,7 +76,7 @@ namespace bagpipe {
           entry.Owner = (OnlineProfilePropertyOwner)ms.ReadByteSafe();
           if (
             entry.Owner != OnlineProfilePropertyOwner.Game
-            || entry.Owner != OnlineProfilePropertyOwner.OnlineService
+            && entry.Owner != OnlineProfilePropertyOwner.OnlineService
           ) {
             warning = true;
           }
@@ -100,7 +136,7 @@ namespace bagpipe {
             warning = true;
           }
 
-          Add(entry);
+          Entries.Add(entry);
         }
 
         if (ms.Position != ms.Length) {
@@ -108,10 +144,13 @@ namespace bagpipe {
         }
       }
 
+      ProfilePath = path;
+      ProfileLoaded?.Invoke(this, null);
+
       return warning;
     }
 
-    public void SaveProfile() {
+    public void Save() {
       // TODO
     }
   }
