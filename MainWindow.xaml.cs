@@ -23,8 +23,11 @@ namespace bagpipe {
   public partial class MainWindow : MetroWindow {
     private readonly Profile profile;
 
-    private readonly OpenFileDialog fileDialog = new OpenFileDialog() {
-      Filter = "Profile File|profile.bin;Player.wsg"
+    private readonly OpenFileDialog openDialog = new OpenFileDialog() {
+      Filter = "Profile Files|profile.bin;Player.wsg|All Files (*.*)|*.*"
+    };
+    private readonly SaveFileDialog saveDialog = new SaveFileDialog() {
+      Filter = "Profile Files|profile.bin;Player.wsg"
     };
 
     public MainWindow() {
@@ -35,9 +38,9 @@ namespace bagpipe {
     }
 
     private void OpenButton_Click(object sender, RoutedEventArgs e) {
-      bool? ok = fileDialog.ShowDialog();
+      bool? ok = openDialog.ShowDialog();
       if (ok.HasValue && ok.Value) {
-        bool warn = profile.Load(fileDialog.FileName);
+        bool warn = profile.Load(openDialog.FileName);
         if (warn) {
           _ = this.ShowMessageAsync(
             "Warning",
@@ -48,7 +51,16 @@ namespace bagpipe {
     }
 
     private void SaveButton_Click(object sender, RoutedEventArgs e) {
-      // TODO
+      bool? ok = saveDialog.ShowDialog();
+      if (ok.HasValue && ok.Value) {
+        bool warn = profile.Save(saveDialog.FileName);
+        if (warn) {
+          _ = this.ShowMessageAsync(
+            "Warning",
+            "Unexpected data was encountered while saving the profile. This may have caused some values to be written incorrectly."
+          );
+        }
+      }
     }
   }
 }

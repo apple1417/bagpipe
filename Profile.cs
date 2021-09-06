@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace bagpipe {
@@ -38,11 +39,18 @@ namespace bagpipe {
     public OnlineDataAdvertisementType AdvertisementType;
   }
 
-  class Profile {
-    public event EventHandler ProfileLoaded;
+  class ProfileUpdateEventArgs : EventArgs {
+    public string Path;
+    public ProfileUpdateEventArgs(string Path) {
+      this.Path = Path;
+    }
+  }
 
-    public string ProfilePath;
-    public ObservableCollection<ProfileEntry> Entries = new ObservableCollection<ProfileEntry>();
+  class Profile {
+    public event EventHandler<ProfileUpdateEventArgs> ProfileLoaded;
+    public event EventHandler<ProfileUpdateEventArgs> ProfileSaved;
+
+    public readonly ObservableCollection<ProfileEntry> Entries = new ObservableCollection<ProfileEntry>();
 
     public bool Load(string path) {
       Entries.Clear();
@@ -144,14 +152,106 @@ namespace bagpipe {
         }
       }
 
-      ProfilePath = path;
-      ProfileLoaded?.Invoke(this, null);
+      ProfileLoaded?.Invoke(this, new ProfileUpdateEventArgs(path));
 
       return warning;
     }
 
-    public void Save() {
-      // TODO
+    public bool Save(string path) {
+      bool warning = false;
+
+      byte[] compressedData;
+      int decompressedSize;
+
+      using(MemoryStream ms = new MemoryStream()) {
+        void WriteInt32(int val) {
+          byte[] buf = new byte[4];
+          BinaryPrimitives.WriteInt32BigEndian(buf, val);
+          ms.Write(buf);
+        }
+        void WriteInt64(long val) {
+          byte[] buf = new byte[8];
+          BinaryPrimitives.WriteInt64BigEndian(buf, val);
+          ms.Write(buf);
+        }
+
+        WriteInt32(Entries.Count);
+
+        foreach (ProfileEntry entry in Entries) {
+          ms.WriteByte((byte)entry.Owner);
+          WriteInt32(entry.ID);
+          ms.WriteByte((byte)entry.Type);
+
+          switch (entry.Type) {
+            case SettingsDataType.Int32: {
+              WriteInt32((int) entry.Value);
+              break;
+            }
+            case SettingsDataType.String: {
+              WriteInt32(((string)entry.Value).Length);
+              ms.Write(Encoding.ASCII.GetBytes((string)entry.Value));
+              break;
+            }
+            case SettingsDataType.Float: {
+              WriteInt32(BitConverter.SingleToInt32Bits((float)entry.Value));
+              break;
+            }
+            case SettingsDataType.Blob: {
+              WriteInt32(((byte[])entry.Value).Length);
+              ms.Write((byte[])entry.Value);
+              break;
+            }
+            case SettingsDataType.Byte: {
+              ms.WriteByte((byte)entry.Value);
+              break;
+            }
+            case SettingsDataType.Empty: {
+              warning = true;
+              break;
+            }
+            case SettingsDataType.Int64: {
+              warning = true;
+              WriteInt64((long)entry.Value);
+              break;
+            }
+            case SettingsDataType.Double: {
+              warning = true;
+              WriteInt64(BitConverter.DoubleToInt64Bits((double)entry.Value));
+              break;
+            }
+            default: {
+              throw new IOException($"Unable to encode entry of type {entry.Type}!");
+            }
+          }
+
+          ms.WriteByte((byte)entry.AdvertisementType);
+        }
+
+        decompressedSize = (int)ms.Length;
+        try {
+          compressedData = LZO.Compress(ms.GetBuffer(), 0, decompressedSize);
+        } catch (Win32Exception ex) {
+          throw new IOException(ex.Message, ex);
+        }
+      }
+
+      using (SHA1Managed sha1 = new SHA1Managed()) {
+        byte[] decompressedSizeBuf = new byte[4];
+        BinaryPrimitives.WriteInt32BigEndian(decompressedSizeBuf, decompressedSize);
+
+        sha1.TransformBlock(decompressedSizeBuf, 0, decompressedSizeBuf.Length, null, 0);
+        sha1.TransformFinalBlock(compressedData, 0, compressedData.Length);
+
+        using (FileStream fs = new FileStream(path, FileMode.Create)) {
+          fs.Write(sha1.Hash);
+          fs.Write(decompressedSizeBuf);
+          fs.Write(compressedData);
+        }
+      }
+
+      ProfileSaved?.Invoke(this, new ProfileUpdateEventArgs(path));
+
+      return warning;
     }
   }
 }

@@ -29,18 +29,18 @@ namespace bagpipe {
         e => new ProfileEntryViewModel(e, this)
       );
 
-      profile.ProfileLoaded += (o, a) => GuessDisplayGame();
+      profile.ProfileLoaded += (sender, e) => GuessDisplayGame(e.Path);
     }
 
-    public void GuessDisplayGame() {
-      FileInfo info = new FileInfo(profile.ProfilePath);
+    public void GuessDisplayGame(string path) {
+      FileInfo info = new FileInfo(path);
       if (info.Name == "Player.wsg") {
         DisplayGame = Game.BL1;
         return;
       }
 
       DirectoryInfo gameFolder = info.Directory;
-      while (gameFolder.Parent != null && gameFolder.Parent.Name != "My Games") {
+      while (gameFolder?.Parent != null && gameFolder.Parent.Name != "My Games") {
         gameFolder = gameFolder.Parent;
       }
       switch (gameFolder.Name) {
