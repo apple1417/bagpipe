@@ -1,43 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace bagpipe {
-  class ProfileViewModel {
+  class ProfileViewModel : NotifyPropertyChanged {
     private readonly Profile profile;
 
-    public string ProfilePath => profile.ProfilePath;
     public ObservableCollection<ProfileEntryViewModel> Entries { get; }
-    public Game DisplayGame { get; set; }
 
-    public static Dictionary<Game, Dictionary<int, string>> EntryNameDict = (
-      JsonSerializer.Deserialize<Dictionary<Game, Dictionary<int, string>>>(
-        Properties.Resources.EntryNames,
-        new JsonSerializerOptions() {
-          Converters = { new JsonStringEnumConverter() },
-          NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.WriteAsString,
-        }
-      )
-    );
+    private Game _displayGame;
+    public Game DisplayGame {
+      get => _displayGame;
+      set => SetProperty(ref _displayGame, value);
+    }
 
     public ProfileViewModel(Profile profile) {
       this.profile = profile;
 
       Entries = new ViewModelObservableCollection<ProfileEntryViewModel, ProfileEntry>(
         profile.Entries,
-        e => new ProfileEntryViewModel(e, GetEntryName)
+        e => new ProfileEntryViewModel(e, this)
       );
 
       profile.ProfileLoaded += (o, a) => GuessDisplayGame();
     }
 
     public void GuessDisplayGame() {
-      FileInfo info = new FileInfo(ProfilePath);
+      FileInfo info = new FileInfo(profile.ProfilePath);
       if (info.Name == "Player.wsg") {
         DisplayGame = Game.BL1;
         return;
@@ -102,28 +98,49 @@ namespace bagpipe {
         DisplayGame = Game.BL2;
       }
     }
-
-    public string GetEntryName(int id) {
-      if (EntryNameDict.ContainsKey(DisplayGame) && EntryNameDict[DisplayGame].ContainsKey(id)) {
-        return EntryNameDict[DisplayGame][id];
-      }
-      return $"Unknown ID {id}";
-    }
   }
 
-  class ProfileEntryViewModel {
+  class ProfileEntryViewModel : NotifyPropertyChanged {
+    private static readonly IReadOnlyDictionary<Game, IReadOnlyDictionary<int, string>> EntryNameDict = (
+      JsonSerializer.Deserialize<IReadOnlyDictionary<Game, IReadOnlyDictionary<int, string>>>(
+        Properties.Resources.EntryNames,
+        new JsonSerializerOptions() {
+          Converters = { new JsonStringEnumConverter() },
+          NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.WriteAsString,
+        }
+      )
+    );
+
     private readonly ProfileEntry entry;
-    private readonly Func<int, string> nameGetter;
-    public ProfileEntryViewModel(ProfileEntry entry, Func<int, string> nameGetter) {
+    public ProfileEntryViewModel(ProfileEntry entry, ProfileViewModel profileVM) {
       this.entry = entry;
-      this.nameGetter = nameGetter;
+      UpdateName(profileVM.DisplayGame);
+
+      profileVM.PropertyChanged += (sender, e) => {
+        if (e.PropertyName == nameof(ProfileViewModel.DisplayGame)) {
+          UpdateName(((ProfileViewModel)sender).DisplayGame);
+        }
+      };
     }
 
-    public string Name => nameGetter(entry.ID);
+    private void UpdateName(Game game) {
+      Name = EntryNameDict.GetValueOrDefault(game)?.GetValueOrDefault(entry.ID) ?? $"Unknown ID {entry.ID}";
+    }
+
+    private string _name;
+    public string Name {
+      get => _name;
+      private set => SetProperty(ref _name, value);
+    }
 
     public object Value {
       get => entry.Value;
-      set => entry.Value = value;
+      set {
+        if (entry.Value != value) {
+          entry.Value = value;
+          InvokePropertyChanged();
+        }
+      }
     }
   }
 }

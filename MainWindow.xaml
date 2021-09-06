@@ -86,7 +86,6 @@
                 </ListView>
             </TabItem>
         </mah:MetroAnimatedTabControl>
-        <!-- TODO: updates -->
         <ComboBox Margin="10,0,0,10"
                   Height="27.3" Width="64"
                   HorizontalAlignment="Left" VerticalAlignment="Bottom"
