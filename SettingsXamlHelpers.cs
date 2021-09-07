@@ -30,17 +30,40 @@ namespace bagpipe {
     }
   }
 
-  class CastingConverter<T, U> : IValueConverter {
+  class CastingConverter : DependencyObject, IValueConverter {
+    public Type ResultType {
+      get => (Type)GetValue(ResultTypeProperty);
+      set => SetValue(ResultTypeProperty, value);
+    }
+    public static readonly DependencyProperty ResultTypeProperty = DependencyProperty.Register(
+      "ResultType", typeof(Type), typeof(CastingConverter), new PropertyMetadata(null)
+    );
+
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-      return System.Convert.ChangeType((T)value, typeof(U));
+      return System.Convert.ChangeType(System.Convert.ChangeType(value, (Type)parameter), ResultType);
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-      return System.Convert.ChangeType((U)value, typeof(T));
+      return System.Convert.ChangeType(System.Convert.ChangeType(value, ResultType), (Type)parameter);
     }
   }
-  class Int32SettingConverter : CastingConverter<int, double> { }
-  class Int64SettingConverter : CastingConverter<long, double> { }
-  class FloatSettingConverter : CastingConverter<float, double> { }
-  class ByteSettingConverter : CastingConverter<byte, double> { }
+
+  class BooleanToZeroWidthConverter : DependencyObject, IValueConverter {
+    public double Width {
+      get => (double)GetValue(WidthProperty);
+      set => SetValue(WidthProperty, value);
+    }
+    public static readonly DependencyProperty WidthProperty = DependencyProperty.Register(
+      "Width", typeof(double), typeof(BooleanToZeroWidthConverter), new PropertyMetadata(null)
+    );
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+      return ((bool)value) ? Width : 0;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+      Width = (double)value;
+      return DependencyProperty.UnsetValue;
+    }
+  }
 }

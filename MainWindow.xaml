@@ -4,32 +4,53 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:bagpipe"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=local:ProfileViewModel}"
         Title="Bagpipe" Height="500" Width="400" MinWidth="300" MinHeight="400">
 
     <Window.Resources>
-        <local:Int32SettingConverter x:Key="Int32SettingConverter"/>
-        <local:Int64SettingConverter x:Key="Int64SettingConverter"/>
-        <local:FloatSettingConverter x:Key="FloatSettingConverter"/>
-        <local:ByteSettingConverter x:Key="ByteSettingConverter"/>
+        <local:CastingConverter x:Key="DoubleCastingConverter" ResultType="{x:Type sys:Double}" />
         <local:SettingsTypeTemplateSelector x:Key="SettingsTypeTemplateSelector" />
+
+        <local:BooleanToZeroWidthConverter x:Key="TypeWidthConverter" Width="{x:Static sys:Double.NaN}"/>
+        <local:BooleanToZeroWidthConverter x:Key="OwnerWidthConverter" Width="{x:Static sys:Double.NaN}"/>
+        <local:BooleanToZeroWidthConverter x:Key="AdvertisementWidthConverter" Width="{x:Static sys:Double.NaN}"/>
+
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
         <DataTemplate x:Key="EmptySettingsTemplate">
             <TextBlock>Empty</TextBlock>
         </DataTemplate>
         <DataTemplate x:Key="Int32SettingsTemplate">
-            <mah:NumericUpDown Minimum="-2147483648"
-                               Maximum="2147483647"
-                               Value="{Binding Value, Converter={StaticResource Int32SettingConverter}}"
+            <mah:NumericUpDown Minimum="{Binding Source={x:Static sys:Int32.MinValue},
+                                                 Mode=OneTime,
+                                                 Converter={StaticResource DoubleCastingConverter},
+                                                 ConverterParameter={x:Type sys:Int32}}"
+                               Maximum="{Binding Source={x:Static sys:Int32.MaxValue},
+                                                 Mode=OneTime,
+                                                 Converter={StaticResource DoubleCastingConverter},
+                                                 ConverterParameter={x:Type sys:Int32}}"
+                               Value="{Binding Value,
+                                               Converter={StaticResource DoubleCastingConverter},
+                                               ConverterParameter={x:Type sys:Int32}}"
                                NumericInputMode="Numbers"
                                ParsingNumberStyle="Integer,AllowThousands" />
         </DataTemplate>
         <DataTemplate x:Key="Int64SettingsTemplate">
-            <mah:NumericUpDown Minimum="-9223372036854775808"
-                               Maximum="9223372036854775807"
-                               Value="{Binding Value, Converter={StaticResource Int64SettingConverter}}"
+            <mah:NumericUpDown Minimum="{Binding Source={x:Static sys:Int64.MinValue},
+                                                 Mode=OneTime,
+                                                 Converter={StaticResource DoubleCastingConverter},
+                                                 ConverterParameter={x:Type sys:Int64}}"
+                               Maximum="{Binding Source={x:Static sys:Int64.MaxValue},
+                                                 Mode=OneTime,
+                                                 Converter={StaticResource DoubleCastingConverter},
+                                                 ConverterParameter={x:Type sys:Int64}}"
+                               Value="{Binding Value,
+                                               Converter={StaticResource DoubleCastingConverter},
+                                               ConverterParameter={x:Type sys:Int64}}"
                                NumericInputMode="Numbers"
                                ParsingNumberStyle="Integer,AllowThousands" />
         </DataTemplate>
@@ -42,9 +63,17 @@
             <TextBox Text="{Binding Value}" />
         </DataTemplate>
         <DataTemplate x:Key="FloatSettingsTemplate">
-            <mah:NumericUpDown Minimum="-3.40282347E+38"
-                               Maximum="3.40282347E+38"
-                               Value="{Binding Value, Converter={StaticResource FloatSettingConverter}}"
+            <mah:NumericUpDown Minimum="{Binding Source={x:Static sys:Single.MinValue},
+                                                 Mode=OneTime,
+                                                 Converter={StaticResource DoubleCastingConverter},
+                                                 ConverterParameter={x:Type sys:Single}}"
+                               Maximum="{Binding Source={x:Static sys:Single.MaxValue},
+                                                 Mode=OneTime,
+                                                 Converter={StaticResource DoubleCastingConverter},
+                                                 ConverterParameter={x:Type sys:Single}}"
+                               Value="{Binding Value,
+                                               Converter={StaticResource DoubleCastingConverter},
+                                               ConverterParameter={x:Type sys:Single}}"
                                NumericInputMode="Decimal"
                                ParsingNumberStyle="Number" />
         </DataTemplate>
@@ -57,14 +86,32 @@
             <mah:DateTimePicker DisplayDate="{Binding Value}" />
         </DataTemplate>
         <DataTemplate x:Key="ByteSettingsTemplate">
-            <mah:NumericUpDown Minimum="0"
-                               Maximum="255"
-                               Value="{Binding Value, Converter={StaticResource ByteSettingConverter}}"
+            <mah:NumericUpDown Minimum="{Binding Source={x:Static sys:Byte.MinValue},
+                                                 Mode=OneTime,
+                                                 Converter={StaticResource DoubleCastingConverter},
+                                                 ConverterParameter={x:Type sys:Byte}}"
+                               Maximum="{Binding Source={x:Static sys:Byte.MaxValue},
+                                                 Mode=OneTime,
+                                                 Converter={StaticResource DoubleCastingConverter},
+                                                 ConverterParameter={x:Type sys:Byte}}"
+                               Value="{Binding Value,
+                                               Converter={StaticResource DoubleCastingConverter},
+                                               ConverterParameter={x:Type sys:Byte}}"
                                NumericInputMode="Numbers"
                                ParsingNumberStyle="Integer,AllowThousands" />
         </DataTemplate>
 
-        <ObjectDataProvider x:Key="GameValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+        <ObjectDataProvider x:Key="OwnerEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:OnlineProfilePropertyOwner"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="AdvertisementEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:OnlineDataAdvertisementType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="GameEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="local:Game"/>
             </ObjectDataProvider.MethodParameters>
@@ -72,31 +119,107 @@
     </Window.Resources>
 
     <Grid>
-        <mah:MetroAnimatedTabControl Margin="0,0,0,42">
+        <mah:MetroAnimatedTabControl x:Name="TabRoot"  Margin="0,0,0,42">
             <TabItem Header="RAW" mah:ControlsHelper.ContentCharacterCasing="Upper">
-                <ListView ItemsSource="{Binding Entries}" Margin="0,0,0,0">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Name"
-                                            DisplayMemberBinding="{Binding Name}" />
-                            <GridViewColumn Header="Value"
-                                            CellTemplateSelector="{StaticResource SettingsTypeTemplateSelector}"/>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+                <Grid Width="{Binding Width, ElementName=TabRoot}"
+                      Height="{Binding Height, ElementName=TabRoot}">
+                    <ListView Margin="0,0,0,45"
+                              ItemsSource="{Binding Entries}"
+                              dd:DragDrop.IsDragSource="{Binding IsOn, ElementName=AdvancedSwitch}"
+                              dd:DragDrop.IsDropTarget="{Binding IsOn, ElementName=AdvancedSwitch}"
+                              dd:DragDrop.DropHandler="{Binding DropHandler}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Name"
+                                                DisplayMemberBinding="{Binding Name}" />
+                                <GridViewColumn DisplayMemberBinding="{Binding Type}"
+                                                Width="{
+                                                    Binding IsOn,
+                                                    ElementName=AdvancedSwitch,
+                                                    Mode=TwoWay,
+                                                    Converter={StaticResource TypeWidthConverter}
+                                                }">
+                                    <GridViewColumnHeader Content="Type"
+                                                          Visibility="{
+                                                              Binding IsOn,
+                                                              ElementName=AdvancedSwitch,
+                                                              Converter={StaticResource BooleanToVisibilityConverter}
+                                                          }" />
+                                </GridViewColumn>
+                                <GridViewColumn Header="Value"
+                                                Width="175"
+                                                CellTemplateSelector="{StaticResource SettingsTypeTemplateSelector}"/>
+                                <GridViewColumn Width="{
+                                                    Binding IsOn,
+                                                    ElementName=AdvancedSwitch,
+                                                    Mode=TwoWay,
+                                                    Converter={StaticResource OwnerWidthConverter}
+                                                }">
+                                    <GridViewColumnHeader Content="Owner"
+                                                          Visibility="{
+                                                              Binding IsOn,
+                                                              ElementName=AdvancedSwitch,
+                                                              Converter={StaticResource BooleanToVisibilityConverter}
+                                                          }" />
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox ItemsSource="{Binding Source={StaticResource OwnerEnumValues}}"
+                                                      SelectedValue="{Binding Owner}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Width="{
+                                                    Binding IsOn,
+                                                    ElementName=AdvancedSwitch,
+                                                    Mode=TwoWay,
+                                                    Converter={StaticResource AdvertisementWidthConverter}
+                                                }">
+                                    <GridViewColumnHeader Content="Advertisement Type"
+                                                          Visibility="{
+                                                              Binding IsOn,
+                                                              ElementName=AdvancedSwitch,
+                                                              Converter={StaticResource BooleanToVisibilityConverter}
+                                                          }" />
+                                        <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox ItemsSource="{Binding Source={StaticResource AdvertisementEnumValues}}"
+                                                      SelectedValue="{Binding AdvertisementType}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    <Button Content="New"
+                            mah:ControlsHelper.ContentCharacterCasing="Upper"
+                            Margin="10,0,0,10"
+                            HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                            IsEnabled="{Binding IsOn, ElementName=AdvancedSwitch}" />
+                    <Button Content="Delete"
+                            mah:ControlsHelper.ContentCharacterCasing="Upper"
+                            Margin="50,0,0,10"
+                            HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                            IsEnabled="{Binding IsOn, ElementName=AdvancedSwitch}" />
+                    <mah:ToggleSwitch x:Name="AdvancedSwitch"
+                                      Content="Advanced Edits"
+                                      Margin="101,0,0,8"
+                                      HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                </Grid>
             </TabItem>
         </mah:MetroAnimatedTabControl>
         <ComboBox Margin="10,0,0,10"
                   Height="27.3" Width="64"
                   HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                  ItemsSource="{Binding Source={StaticResource GameValues}}"
+                  ItemsSource="{Binding Source={StaticResource GameEnumValues}}"
                   SelectedValue="{Binding DisplayGame}" />
-        <Button Content="SAVE"
+        <Button Content="Save"
+                mah:ControlsHelper.ContentCharacterCasing="Upper"
                 Margin="0,0,10,10"
                 Height="27.3"
                 HorizontalAlignment="Right" VerticalAlignment="Bottom"
                 Click="SaveButton_Click" />
-        <Button Content="OPEN"
+        <Button Content="Open"
+                mah:ControlsHelper.ContentCharacterCasing="Upper"
                 Margin="0,0,51,10"
                 Height="27.3"
                 HorizontalAlignment="Right"

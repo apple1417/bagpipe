@@ -15,6 +15,7 @@ using System.Globalization;
 using System.Linq;
 using System.Collections.ObjectModel;
 using Microsoft.Win32;
+using ControlzEx.Theming;
 
 namespace bagpipe {
   /// <summary>
@@ -32,6 +33,9 @@ namespace bagpipe {
 
     public MainWindow() {
       InitializeComponent();
+
+      ThemeManager.Current.ThemeSyncMode = ThemeSyncMode.SyncWithAppMode;
+      ThemeManager.Current.SyncTheme();
 
       profile = new Profile();
       DataContext = new ProfileViewModel(profile);

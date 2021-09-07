@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GongSolutions.Wpf.DragDrop;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -13,6 +14,7 @@ namespace bagpipe {
   class ProfileViewModel : NotifyPropertyChanged {
     private readonly Profile profile;
 
+    public IDropTarget DropHandler { get; }
     public ObservableCollection<ProfileEntryViewModel> Entries { get; }
 
     private Game _displayGame;
@@ -24,6 +26,7 @@ namespace bagpipe {
     public ProfileViewModel(Profile profile) {
       this.profile = profile;
 
+      DropHandler = new ProfileDropHandler(profile, this);
       Entries = new ViewModelObservableCollection<ProfileEntryViewModel, ProfileEntry>(
         profile.Entries,
         e => new ProfileEntryViewModel(e, this)
@@ -100,13 +103,45 @@ namespace bagpipe {
     }
   }
 
+  class ProfileDropHandler : DefaultDropHandler {
+    private readonly Profile profile;
+    private readonly ProfileViewModel profileVM;
+    public ProfileDropHandler(Profile profile, ProfileViewModel profileVM) {
+      this.profile = profile;
+      this.profileVM = profileVM;
+    }
+
+    public override void Drop(IDropInfo dropInfo) {
+      if (dropInfo?.DragInfo == null) {
+        return;
+      }
+
+      int insertIndex = GetInsertIndex(dropInfo);
+      IOrderedEnumerable<ProfileEntryViewModel> selectedItems = (
+        ExtractData(dropInfo.Data)
+        .Cast<ProfileEntryViewModel>()
+        .OrderBy(entryVM => profileVM.Entries.IndexOf(entryVM))
+      );
+
+      foreach (ProfileEntryViewModel entryVM in selectedItems) {
+        int index = profileVM.Entries.IndexOf(entryVM);
+        if (insertIndex > index) {
+          insertIndex--;
+        }
+
+        profile.Entries.Move(index, insertIndex);
+        insertIndex++;
+      }
+    }
+  }
+
   class ProfileEntryViewModel : NotifyPropertyChanged {
     private static readonly IReadOnlyDictionary<Game, IReadOnlyDictionary<int, string>> EntryNameDict = (
       JsonSerializer.Deserialize<IReadOnlyDictionary<Game, IReadOnlyDictionary<int, string>>>(
         Properties.Resources.EntryNames,
         new JsonSerializerOptions() {
           Converters = { new JsonStringEnumConverter() },
-          NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.WriteAsString,
+          NumberHandling = JsonNumberHandling.AllowReadingFromString
         }
       )
     );
@@ -133,14 +168,30 @@ namespace bagpipe {
       private set => SetProperty(ref _name, value);
     }
 
+    public OnlineProfilePropertyOwner Owner {
+      get => entry.Owner;
+      set => SetProperty(ref entry.Owner, value);
+    }
+
+    public SettingsDataType Type {
+      get => entry.Type;
+      // No setter since I don't want to deal with updating templates live
+    }
+
     public object Value {
       get => entry.Value;
+      // entry.Value is a property so we can't pass via ref
       set {
         if (entry.Value != value) {
           entry.Value = value;
           InvokePropertyChanged();
         }
       }
+    }
+
+    public OnlineDataAdvertisementType AdvertisementType {
+      get => entry.AdvertisementType;
+      set => SetProperty(ref entry.AdvertisementType, value);
     }
   }
 }
