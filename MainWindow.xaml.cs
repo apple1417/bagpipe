@@ -66,5 +66,30 @@ namespace bagpipe {
         }
       }
     }
+
+    private void NewButton_Click(object sender, RoutedEventArgs e) {
+      // TODO
+    }
+
+    private bool DeleteRawEntries() {
+      if (AdvancedSwitch.IsOn) {
+        IEnumerable<int> selectedIndexes = RawListView.SelectedItems.Cast<ProfileEntryViewModel>().Select(x => RawListView.Items.IndexOf(x));
+        foreach (int idx in selectedIndexes.OrderByDescending(x => x)) {
+          profile.Entries.RemoveAt(idx);
+        }
+        return true;
+      }
+      return false;
+    }
+
+    private void DeleteButton_Click(object sender, RoutedEventArgs e) {
+      DeleteRawEntries();
+    }
+
+    private void RawListView_KeyUp(object sender, KeyEventArgs e) {
+      if (e.Key == Key.Delete) {
+        e.Handled |= DeleteRawEntries();
+      }
+    }
   }
 }

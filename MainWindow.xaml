@@ -123,8 +123,10 @@
             <TabItem Header="RAW" mah:ControlsHelper.ContentCharacterCasing="Upper">
                 <Grid Width="{Binding Width, ElementName=TabRoot}"
                       Height="{Binding Height, ElementName=TabRoot}">
-                    <ListView Margin="0,0,0,45"
+                    <ListView x:Name="RawListView"
+                              Margin="0,0,0,45"
                               ItemsSource="{Binding Entries}"
+                              KeyUp="RawListView_KeyUp"
                               dd:DragDrop.IsDragSource="{Binding IsOn, ElementName=AdvancedSwitch}"
                               dd:DragDrop.IsDropTarget="{Binding IsOn, ElementName=AdvancedSwitch}"
                               dd:DragDrop.DropHandler="{Binding DropHandler}">
@@ -194,12 +196,27 @@
                             mah:ControlsHelper.ContentCharacterCasing="Upper"
                             Margin="10,0,0,10"
                             HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                            Click="NewButton_Click"
                             IsEnabled="{Binding IsOn, ElementName=AdvancedSwitch}" />
                     <Button Content="Delete"
                             mah:ControlsHelper.ContentCharacterCasing="Upper"
                             Margin="50,0,0,10"
                             HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                            IsEnabled="{Binding IsOn, ElementName=AdvancedSwitch}" />
+                            Click="DeleteButton_Click">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
+                                <Setter Property="IsEnabled" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsOn, ElementName=AdvancedSwitch}" Value="False">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding SelectedIndex, ElementName=RawListView}" Value="-1">
+                                        <Setter Property="IsEnabled" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                     <mah:ToggleSwitch x:Name="AdvancedSwitch"
                                       Content="Advanced Edits"
                                       Margin="101,0,0,8"
@@ -222,8 +239,7 @@
                 mah:ControlsHelper.ContentCharacterCasing="Upper"
                 Margin="0,0,51,10"
                 Height="27.3"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Bottom"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"
                 Click="OpenButton_Click" />
     </Grid>
 </mah:MetroWindow>
