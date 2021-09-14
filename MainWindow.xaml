@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:gb="clr-namespace:System.Globalization;assembly=mscorlib"
         xmlns:local="clr-namespace:bagpipe"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:ProfileViewModel}"
@@ -82,8 +83,8 @@
             <TextBlock>- binary data -</TextBlock>
         </DataTemplate>
         <DataTemplate x:Key="DateTimeSettingsTemplate">
-            <!-- TODO: this probably needs a converter -->
-            <mah:DateTimePicker DisplayDate="{Binding Value}" />
+            <mah:DateTimePicker Culture="{x:Static gb:CultureInfo.CurrentCulture}"
+                                SelectedDateTime="{Binding Value}"/>
         </DataTemplate>
         <DataTemplate x:Key="ByteSettingsTemplate">
             <mah:NumericUpDown Minimum="{Binding Source={x:Static sys:Byte.MinValue},
@@ -101,17 +102,17 @@
                                ParsingNumberStyle="Integer,AllowThousands" />
         </DataTemplate>
 
-        <ObjectDataProvider x:Key="OwnerEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+        <ObjectDataProvider x:Key="OwnerEnumValues" ObjectType="{x:Type sys:Enum}" MethodName="GetValues" >
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="local:OnlineProfilePropertyOwner"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
-        <ObjectDataProvider x:Key="AdvertisementEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+        <ObjectDataProvider x:Key="AdvertisementEnumValues" ObjectType="{x:Type sys:Enum}" MethodName="GetValues" >
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="local:OnlineDataAdvertisementType"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
-        <ObjectDataProvider x:Key="GameEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+        <ObjectDataProvider x:Key="GameEnumValues" ObjectType="{x:Type sys:Enum}" MethodName="GetValues" >
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="local:Game"/>
             </ObjectDataProvider.MethodParameters>

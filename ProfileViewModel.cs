@@ -11,7 +11,72 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace bagpipe {
-  class ProfileViewModel : NotifyPropertyChanged {
+  class ProfileEntryViewModel : ViewModelBase {
+    private static readonly IReadOnlyDictionary<Game, IReadOnlyDictionary<int, string>> EntryNameDict = (
+      JsonSerializer.Deserialize<IReadOnlyDictionary<Game, IReadOnlyDictionary<int, string>>>(
+        Properties.Resources.EntryNames,
+        new JsonSerializerOptions() {
+          Converters = { new JsonStringEnumConverter() },
+          NumberHandling = JsonNumberHandling.AllowReadingFromString
+        }
+      )
+    );
+
+    private readonly ProfileEntry entry;
+    public ProfileEntryViewModel(ProfileEntry entry, ProfileViewModel profileVM) {
+      this.entry = entry;
+      UpdateName(profileVM.DisplayGame);
+
+      profileVM.PropertyChanged += (sender, e) => {
+        if (e.PropertyName == nameof(ProfileViewModel.DisplayGame)) {
+          UpdateName(((ProfileViewModel) sender).DisplayGame);
+        }
+      };
+    }
+
+    private void UpdateName(Game game) {
+      Name = EntryNameDict.GetValueOrDefault(game)?.GetValueOrDefault(entry.ID) ?? $"Unknown ID {entry.ID}";
+    }
+
+    private string _name;
+    public string Name {
+      get => _name;
+      private set => SetProperty(ref _name, value);
+    }
+
+    public OnlineProfilePropertyOwner Owner {
+      get => entry.Owner;
+      set => SetProperty(ref entry.Owner, value);
+    }
+
+    public SettingsDataType Type {
+      get => entry.Type;
+      // No setter since I don't want to deal with updating templates live
+    }
+
+    public object Value {
+      get => entry.Value;
+      set {
+        if (entry.Value != value) {
+          bool dateTimeNull = Type == SettingsDataType.DateTime && value is null;
+          ValidationCheck(!dateTimeNull, "Unable to convert to valid time!");
+          ValidationCheck(dateTimeNull || entry.IsValidValue(value), $"Invalid value for data type {Type}!");
+
+          if (PropertyValid()) {
+            entry.Value = value;
+            InvokePropertyChanged();
+          }
+        }
+      }
+    }
+
+    public OnlineDataAdvertisementType AdvertisementType {
+      get => entry.AdvertisementType;
+      set => SetProperty(ref entry.AdvertisementType, value);
+    }
+  }
+
+  class ProfileViewModel : ViewModelBase {
     private readonly Profile profile;
 
     public IDropTarget DropHandler { get; }
@@ -132,66 +197,6 @@ namespace bagpipe {
         profile.Entries.Move(index, insertIndex);
         insertIndex++;
       }
-    }
-  }
-
-  class ProfileEntryViewModel : NotifyPropertyChanged {
-    private static readonly IReadOnlyDictionary<Game, IReadOnlyDictionary<int, string>> EntryNameDict = (
-      JsonSerializer.Deserialize<IReadOnlyDictionary<Game, IReadOnlyDictionary<int, string>>>(
-        Properties.Resources.EntryNames,
-        new JsonSerializerOptions() {
-          Converters = { new JsonStringEnumConverter() },
-          NumberHandling = JsonNumberHandling.AllowReadingFromString
-        }
-      )
-    );
-
-    private readonly ProfileEntry entry;
-    public ProfileEntryViewModel(ProfileEntry entry, ProfileViewModel profileVM) {
-      this.entry = entry;
-      UpdateName(profileVM.DisplayGame);
-
-      profileVM.PropertyChanged += (sender, e) => {
-        if (e.PropertyName == nameof(ProfileViewModel.DisplayGame)) {
-          UpdateName(((ProfileViewModel)sender).DisplayGame);
-        }
-      };
-    }
-
-    private void UpdateName(Game game) {
-      Name = EntryNameDict.GetValueOrDefault(game)?.GetValueOrDefault(entry.ID) ?? $"Unknown ID {entry.ID}";
-    }
-
-    private string _name;
-    public string Name {
-      get => _name;
-      private set => SetProperty(ref _name, value);
-    }
-
-    public OnlineProfilePropertyOwner Owner {
-      get => entry.Owner;
-      set => SetProperty(ref entry.Owner, value);
-    }
-
-    public SettingsDataType Type {
-      get => entry.Type;
-      // No setter since I don't want to deal with updating templates live
-    }
-
-    public object Value {
-      get => entry.Value;
-      // entry.Value is a property so we can't pass via ref
-      set {
-        if (entry.Value != value) {
-          entry.Value = value;
-          InvokePropertyChanged();
-        }
-      }
-    }
-
-    public OnlineDataAdvertisementType AdvertisementType {
-      get => entry.AdvertisementType;
-      set => SetProperty(ref entry.AdvertisementType, value);
     }
   }
 }

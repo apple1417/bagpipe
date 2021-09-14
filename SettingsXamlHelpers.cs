@@ -63,7 +63,7 @@ namespace bagpipe {
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
       Width = (double)value;
-      return DependencyProperty.UnsetValue;
+      return Binding.DoNothing;
     }
   }
 }

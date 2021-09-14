@@ -16,11 +16,9 @@ using System.Linq;
 using System.Collections.ObjectModel;
 using Microsoft.Win32;
 using ControlzEx.Theming;
+using System.Windows.Markup;
 
 namespace bagpipe {
-  /// <summary>
-  /// Interaction logic for MainWindow.xaml
-  /// </summary>
   public partial class MainWindow : MetroWindow {
     private readonly Profile profile;
 
@@ -33,6 +31,8 @@ namespace bagpipe {
 
     public MainWindow() {
       InitializeComponent();
+
+      Language = XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.Name);
 
       ThemeManager.Current.ThemeSyncMode = ThemeSyncMode.SyncWithAppMode;
       ThemeManager.Current.SyncTheme();

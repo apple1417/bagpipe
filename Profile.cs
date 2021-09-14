@@ -17,26 +17,29 @@ namespace bagpipe {
     public object Value {
       get => _value;
       set {
-        if (Type switch {
-          SettingsDataType.Empty => value is null,
-          SettingsDataType.Int32 => value is int,
-          SettingsDataType.Int64 => value is long,
-          SettingsDataType.Double => value is double,
-          SettingsDataType.String => value is string,
-          SettingsDataType.Float => value is float,
-          SettingsDataType.Blob => value is byte[],
-          SettingsDataType.DateTime => value is DateTime,
-          SettingsDataType.Byte => value is byte,
-          _ => false,
-        }) {
+        if (IsValidValue(value)) {
           _value = value;
         } else {
-          throw new ArgumentException($"Tried to set invalid type {value.GetType().Name} for type field {Type}");
+          string typeName = value?.GetType()?.Name ?? "null";
+          throw new ArgumentException($"Tried to set invalid type {typeName} for type field {Type}");
         }
       }
     }
 
     public OnlineDataAdvertisementType AdvertisementType;
+
+    public bool IsValidValue(object value) => Type switch {
+      SettingsDataType.Empty => value is null,
+      SettingsDataType.Int32 => value is int,
+      SettingsDataType.Int64 => value is long,
+      SettingsDataType.Double => value is double,
+      SettingsDataType.String => value is string,
+      SettingsDataType.Float => value is float,
+      SettingsDataType.Blob => value is byte[],
+      SettingsDataType.DateTime => value is DateTime,
+      SettingsDataType.Byte => value is byte,
+      _ => false,
+    };
   }
 
   class ProfileUpdateEventArgs : EventArgs {
@@ -117,6 +120,7 @@ namespace bagpipe {
               entry.Value = ms.ReadByteSafe();
               break;
             }
+            // Haven't encountered these in practice, but can make decent educated guesses
             case SettingsDataType.Empty: {
               warning = true;
               break;
@@ -131,6 +135,21 @@ namespace bagpipe {
               entry.Value = BitConverter.Int64BitsToDouble(
                 BinaryPrimitives.ReadInt64BigEndian(ms.ReadByteArray(8))
               );
+              break;
+            }
+            /*
+            This one's harder to guess, the only definite hint we have is getters/setters which take two seperate int values
+            UnrealScript ints are 32bit, so we're probably looking at 8 bytes data
+
+            UE4 has a FDateTime struct, which uses int64 ticks - maybe it just splits this value in two out of neccesity?
+            https://docs.unrealengine.com/4.26/en-US/API/Runtime/Core/Misc/FDateTime/
+            Very conveniently, this seems to use the exact same format as dotnet's DateTime
+
+            In practice, nothing ever sets values of this type, so doesn't really matter if this is wrong
+            */
+            case SettingsDataType.DateTime: {
+              warning = true;
+              entry.Value = new DateTime(BinaryPrimitives.ReadInt64BigEndian(ms.ReadByteArray(8)));
               break;
             }
             default: {
@@ -205,6 +224,7 @@ namespace bagpipe {
               ms.WriteByte((byte)entry.Value);
               break;
             }
+            // Educated guesses
             case SettingsDataType.Empty: {
               warning = true;
               break;
@@ -217,6 +237,11 @@ namespace bagpipe {
             case SettingsDataType.Double: {
               warning = true;
               WriteInt64(BitConverter.DoubleToInt64Bits((double)entry.Value));
+              break;
+            }
+            case SettingsDataType.DateTime: {
+              warning = true;
+              WriteInt64(((DateTime)entry.Value).Ticks);
               break;
             }
             default: {
