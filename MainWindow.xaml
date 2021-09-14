@@ -14,6 +14,7 @@
 
     <Window.Resources>
         <local:CastingConverter x:Key="DoubleCastingConverter" ResultType="{x:Type sys:Double}" />
+        <local:HexByteArrayConverter x:Key="HexByteArrayConverter" />
         <local:SettingsTypeTemplateSelector x:Key="SettingsTypeTemplateSelector" />
 
         <local:BooleanToZeroWidthConverter x:Key="TypeWidthConverter" Width="{x:Static sys:Double.NaN}"/>
@@ -61,7 +62,10 @@
                                ParsingNumberStyle="Number" />
         </DataTemplate>
         <DataTemplate x:Key="StringSettingsTemplate">
-            <TextBox Text="{Binding Value}" />
+            <TextBox Text="{Binding Value}"
+                     TextWrapping="Wrap"
+                     MaxLines="5"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"/>
         </DataTemplate>
         <DataTemplate x:Key="FloatSettingsTemplate">
             <mah:NumericUpDown Minimum="{Binding Source={x:Static sys:Single.MinValue},
@@ -79,8 +83,17 @@
                                ParsingNumberStyle="Number" />
         </DataTemplate>
         <DataTemplate x:Key="BlobSettingsTemplate">
-            <!-- TODO -->
-            <TextBlock>- binary data -</TextBlock>
+            <TextBox TextWrapping="Wrap"
+                     MaxLines="5"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <TextBox.Text>
+                    <Binding Path="Value" Converter="{StaticResource HexByteArrayConverter}">
+                        <Binding.ValidationRules>
+                            <local:HexByteArrayConverter />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+            </TextBox>
         </DataTemplate>
         <DataTemplate x:Key="DateTimeSettingsTemplate">
             <mah:DateTimePicker Culture="{x:Static gb:CultureInfo.CurrentCulture}"
