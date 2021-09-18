@@ -86,7 +86,7 @@ namespace bagpipe {
       null,  0xA,  0xB,  0xC,  0xD,  0xE,  0xF,
     };
 
-    private static (bool isValid, string errorMsg) TryConvertHexToByteArray(string str, out byte[] output) {
+    private static (bool isValid, string errorMsg, byte[] converted) TryConvertHexToByteArray(string str) {
       List<byte> convertedBytes = new List<byte>();
 
       int? highIdx = null;
@@ -95,8 +95,7 @@ namespace bagpipe {
           continue;
         }
         if (!IsHexDigit(c)) {
-          output = new byte[0];
-          return (false, $"Invalid hex digit '{c}'!");
+          return (false, $"Invalid hex digit '{c}'!", null);
         }
 
         int idx = c - (c > '\u00FF' ? '\uFF10' : '\x0030');
@@ -109,16 +108,14 @@ namespace bagpipe {
       }
 
       if (highIdx.HasValue) {
-        output = new byte[0];
-        return (false, "Odd number of hex digits!");
+        return (false, "Odd number of hex digits!", null);
       }
 
-      output = convertedBytes.ToArray();
-      return (true, null);
+      return (true, null, convertedBytes.ToArray());
     }
 
     public override ValidationResult Validate(object value, CultureInfo cultureInfo) {
-      (bool isValid, string errorMsg) = TryConvertHexToByteArray((string) value, out _);
+      (bool isValid, string errorMsg, _) = TryConvertHexToByteArray((string)value);
       return isValid ? ValidationResult.ValidResult : new ValidationResult(false, errorMsg);
     }
 
@@ -127,7 +124,7 @@ namespace bagpipe {
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-      (bool isValid, _) = TryConvertHexToByteArray((string)value, out byte[] converted);
+      (bool isValid, _, byte[] converted) = TryConvertHexToByteArray((string)value);
       return isValid ? converted : DependencyProperty.UnsetValue;
     }
   }

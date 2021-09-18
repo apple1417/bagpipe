@@ -35,7 +35,9 @@ namespace bagpipe {
     }
 
     private void UpdateName(Game game) {
-      Name = EntryNameDict.GetValueOrDefault(game)?.GetValueOrDefault(entry.ID) ?? $"Unknown ID {entry.ID}";
+      Name = (game == Game.None)
+        ? $"ID {entry.ID}"
+        : EntryNameDict.GetValueOrDefault(game)?.GetValueOrDefault(entry.ID) ?? $"Unknown ID {entry.ID}";
     }
 
     private string _name;

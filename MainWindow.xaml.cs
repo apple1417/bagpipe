@@ -67,8 +67,16 @@ namespace bagpipe {
       }
     }
 
-    private void NewButton_Click(object sender, RoutedEventArgs e) {
-      // TODO
+    private async void NewButton_Click(object sender, RoutedEventArgs e) {
+      NewEntryDialog dialog = new NewEntryDialog(((ProfileViewModel)DataContext).DisplayGame);
+      await this.ShowMetroDialogAsync(dialog);
+
+      ProfileEntry entry = await dialog.GetCreatedEntry();
+      if (!(entry is null)) {
+        profile.Entries.Add(entry);
+      }
+
+      await this.HideMetroDialogAsync(dialog);
     }
 
     private bool DeleteRawEntries() {
@@ -86,7 +94,7 @@ namespace bagpipe {
       DeleteRawEntries();
     }
 
-    private void RawListView_KeyUp(object sender, KeyEventArgs e) {
+    private void RawListView_KeyDown(object sender, KeyEventArgs e) {
       if (e.Key == Key.Delete) {
         e.Handled |= DeleteRawEntries();
       }

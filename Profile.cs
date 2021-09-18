@@ -203,7 +203,7 @@ namespace bagpipe {
 
           switch (entry.Type) {
             case SettingsDataType.Int32: {
-              WriteInt32((int) entry.Value);
+              WriteInt32((int)entry.Value);
               break;
             }
             case SettingsDataType.String: {

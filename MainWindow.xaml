@@ -10,7 +10,14 @@
         xmlns:local="clr-namespace:bagpipe"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:ProfileViewModel}"
-        Title="Bagpipe" Height="500" Width="400" MinWidth="300" MinHeight="400">
+        Title="Bagpipe"
+        Width="400" Height="500" 
+        MinWidth="400" MinHeight="500"
+        ShowDialogsOverTitleBar="False">
+
+    <mah:MetroWindow.MetroDialogOptions>
+        <mah:MetroDialogSettings OwnerCanCloseWithDialog="True" />
+    </mah:MetroWindow.MetroDialogOptions>
 
     <Window.Resources>
         <local:CastingConverter x:Key="DoubleCastingConverter" ResultType="{x:Type sys:Double}" />
@@ -57,6 +64,7 @@
                                ParsingNumberStyle="Integer,AllowThousands" />
         </DataTemplate>
         <DataTemplate x:Key="DoubleSettingsTemplate">
+            <!-- TODO: can't actually input decimals? -->
             <mah:NumericUpDown Value="{Binding Value}"
                                NumericInputMode="Decimal"
                                ParsingNumberStyle="Number" />
@@ -115,6 +123,11 @@
                                ParsingNumberStyle="Integer,AllowThousands" />
         </DataTemplate>
 
+        <Style TargetType="{x:Type Button}" BasedOn="{mah:StaticResource MahApps.Styles.Button}">
+            <Setter Property="mah:ControlsHelper.ContentCharacterCasing"
+                    Value="Upper" />
+        </Style>
+
         <ObjectDataProvider x:Key="OwnerEnumValues" ObjectType="{x:Type sys:Enum}" MethodName="GetValues" >
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="local:OnlineProfilePropertyOwner"/>
@@ -133,14 +146,22 @@
     </Window.Resources>
 
     <Grid>
-        <mah:MetroAnimatedTabControl x:Name="TabRoot"  Margin="0,0,0,42">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <mah:MetroAnimatedTabControl x:Name="TabRoot" Grid.Row="0">
             <TabItem Header="RAW" mah:ControlsHelper.ContentCharacterCasing="Upper">
                 <Grid Width="{Binding Width, ElementName=TabRoot}"
                       Height="{Binding Height, ElementName=TabRoot}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
                     <ListView x:Name="RawListView"
-                              Margin="0,0,0,45"
+                              Grid.Row="0"
                               ItemsSource="{Binding Entries}"
-                              KeyUp="RawListView_KeyUp"
+                              KeyDown="RawListView_KeyDown"
                               dd:DragDrop.IsDragSource="{Binding IsOn, ElementName=AdvancedSwitch}"
                               dd:DragDrop.IsDropTarget="{Binding IsOn, ElementName=AdvancedSwitch}"
                               dd:DragDrop.DropHandler="{Binding DropHandler}">
@@ -206,54 +227,54 @@
                             </GridView>
                         </ListView.View>
                     </ListView>
-                    <Button Content="New"
-                            mah:ControlsHelper.ContentCharacterCasing="Upper"
-                            Margin="10,0,0,10"
-                            HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                            Click="NewButton_Click"
-                            IsEnabled="{Binding IsOn, ElementName=AdvancedSwitch}" />
-                    <Button Content="Delete"
-                            mah:ControlsHelper.ContentCharacterCasing="Upper"
-                            Margin="50,0,0,10"
-                            HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                            Click="DeleteButton_Click">
-                        <Button.Style>
-                            <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
-                                <Setter Property="IsEnabled" Value="True" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsOn, ElementName=AdvancedSwitch}" Value="False">
-                                        <Setter Property="IsEnabled" Value="False" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding SelectedIndex, ElementName=RawListView}" Value="-1">
-                                        <Setter Property="IsEnabled" Value="False" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    <mah:ToggleSwitch x:Name="AdvancedSwitch"
-                                      Content="Advanced Edits"
-                                      Margin="101,0,0,8"
-                                      HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                    <StackPanel Grid.Row="1" Margin="10,5,10,5" Orientation="Horizontal">
+                        <Button Content="New"
+                                HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                Click="NewButton_Click"
+                                IsEnabled="{Binding IsOn, ElementName=AdvancedSwitch}" />
+                        <Button Content="Delete"
+                                Margin="5,0,0,0"
+                                HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                Click="DeleteButton_Click">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
+                                    <Setter Property="IsEnabled" Value="True" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsOn, ElementName=AdvancedSwitch}" Value="False">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding SelectedIndex, ElementName=RawListView}" Value="-1">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <mah:ToggleSwitch x:Name="AdvancedSwitch"
+                                          Content="Advanced Edits"
+                                          Margin="5,-2.7,0,-2"
+                                          HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                    </StackPanel>
                 </Grid>
             </TabItem>
         </mah:MetroAnimatedTabControl>
-        <ComboBox Margin="10,0,0,10"
-                  Height="27.3" Width="64"
-                  HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                  ItemsSource="{Binding Source={StaticResource GameEnumValues}}"
-                  SelectedValue="{Binding DisplayGame}" />
-        <Button Content="Save"
-                mah:ControlsHelper.ContentCharacterCasing="Upper"
-                Margin="0,0,10,10"
-                Height="27.3"
-                HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                Click="SaveButton_Click" />
-        <Button Content="Open"
-                mah:ControlsHelper.ContentCharacterCasing="Upper"
-                Margin="0,0,51,10"
-                Height="27.3"
-                HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                Click="OpenButton_Click" />
+        <DockPanel Grid.Row="1" Margin="10,5,10,10">
+            <ComboBox DockPanel.Dock="Left"
+                      Height="27.3" Width="64"
+                      HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                      ItemsSource="{Binding Source={StaticResource GameEnumValues}}"
+                      SelectedValue="{Binding DisplayGame}" />
+            <Button DockPanel.Dock="Right"
+                    Content="Save"
+                    Height="27.3"
+                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                    Click="SaveButton_Click" />
+            <Button DockPanel.Dock="Right"
+                    Content="Open"
+                    Margin="0,0,5,0"
+                    Height="27.3"
+                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                    Click="OpenButton_Click" />
+        </DockPanel>
     </Grid>
 </mah:MetroWindow>

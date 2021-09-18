@@ -28,6 +28,7 @@ namespace bagpipe {
   }
 
   enum Game {
+    None,
     BL1,
     BL1E,
     BL2,
