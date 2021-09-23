@@ -57,13 +57,7 @@ namespace bagpipe {
     private void SaveButton_Click(object sender, RoutedEventArgs e) {
       bool? ok = saveDialog.ShowDialog();
       if (ok.HasValue && ok.Value) {
-        bool warn = profile.Save(saveDialog.FileName);
-        if (warn) {
-          _ = this.ShowMessageAsync(
-            "Warning",
-            "Unexpected data was encountered while saving the profile. This may have caused some values to be written incorrectly."
-          );
-        }
+        profile.Save(saveDialog.FileName);
       }
     }
 

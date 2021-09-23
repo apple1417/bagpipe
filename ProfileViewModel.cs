@@ -7,21 +7,9 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace bagpipe {
   class ProfileEntryViewModel : ViewModelBase {
-    private static readonly IReadOnlyDictionary<Game, IReadOnlyDictionary<int, string>> EntryNameDict = (
-      JsonSerializer.Deserialize<IReadOnlyDictionary<Game, IReadOnlyDictionary<int, string>>>(
-        Properties.Resources.EntryNames,
-        new JsonSerializerOptions() {
-          Converters = { new JsonStringEnumConverter() },
-          NumberHandling = JsonNumberHandling.AllowReadingFromString
-        }
-      )
-    );
-
     private readonly ProfileEntry entry;
     public ProfileEntryViewModel(ProfileEntry entry, ProfileViewModel profileVM) {
       this.entry = entry;
@@ -37,7 +25,7 @@ namespace bagpipe {
     private void UpdateName(Game game) {
       Name = (game == Game.None)
         ? $"ID {entry.ID}"
-        : EntryNameDict.GetValueOrDefault(game)?.GetValueOrDefault(entry.ID) ?? $"Unknown ID {entry.ID}";
+        : KnownSettings.Data.GetValueOrDefault(game)?.GetValueOrDefault(entry.ID).Name ?? $"Unknown ID {entry.ID}";
     }
 
     private string _name;

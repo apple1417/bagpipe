@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -12,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MahApps.Metro.Controls.Dialogs;
+using SettingsData = bagpipe.KnownSettings.SettingsData;
 
 namespace bagpipe {
   public partial class NewEntryDialog : CustomDialog {
@@ -34,7 +37,7 @@ namespace bagpipe {
         Value = 0,
         AdvertisementType = OnlineDataAdvertisementType.DontAdvertise
       };
-      DataContext = new NewEntryViewModel(entry) { DisplayGame = DisplayGame };
+      DataContext = new NewEntryViewModel(entry, DisplayGame, PresetComboBox);
     }
 
     private void Add() => tcs.TrySetResult(entry);
@@ -71,21 +74,54 @@ namespace bagpipe {
   }
 
   class NewEntryViewModel: ViewModelBase {
-    private readonly ProfileEntry entry;
-    public NewEntryViewModel(ProfileEntry entry) {
-      this.entry = entry;
+    public static ReadOnlyObservableCollection<Game> ValidGames { get; } = new ReadOnlyObservableCollection<Game>(
+      new ObservableCollection<Game>(
+        Enum.GetValues(typeof(Game)).Cast<Game>().Where(x => x != Game.None)
+      )
+    );
+
+    private readonly ProfileEntry Entry;
+    private ComboBox PresetComboBox;
+    public NewEntryViewModel(ProfileEntry Entry, Game DisplayGame, ComboBox PresetComboBox) {
+      this.Entry = Entry;
+      this.PresetComboBox = PresetComboBox;
+
+      // Default to TPS cause it has the most known fields
+      this.DisplayGame = DisplayGame == Game.None ? Game.TPS : DisplayGame;
+
+      PresetComboBox.SelectionChanged += PresetComboBox_SelectionChanged;
+    }
+
+    private void PresetComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+      SettingsData selected = (SettingsData)PresetComboBox.SelectedItem;
+      if (selected != null) {
+        ID = selected.ID;
+        Type = selected.Type;
+      }
+    }
+
+    private void TryUpdatePreset() {
+      SettingsData match = KnownSettings.Data.GetValueOrDefault(DisplayGame)?.GetValueOrDefault(ID);
+      if (match != null && match.Type == Type && Presets.Contains(match)) {
+        PresetComboBox.SelectedItem = match;
+      } else {
+        PresetComboBox.SelectedItem = null;
+      }
     }
 
     public int ID {
-      get => entry.ID;
-      set => SetProperty(ref entry.ID, value);
+      get => Entry.ID;
+      set {
+        SetProperty(ref Entry.ID, value);
+        TryUpdatePreset();
+      }
     }
 
     public SettingsDataType Type {
-      get => entry.Type;
+      get => Entry.Type;
       set {
-        SetProperty(ref entry.Type, value);
-        entry.Value = value switch {
+        SetProperty(ref Entry.Type, value);
+        Entry.Value = value switch {
           SettingsDataType.Empty => null,
           SettingsDataType.Int32 => 0,
           SettingsDataType.Int64 => 0L,
@@ -97,13 +133,30 @@ namespace bagpipe {
           SettingsDataType.Byte => (byte)0,
           _ => throw new NotImplementedException(),
         };
+        TryUpdatePreset();
       }
+    }
+
+    private static readonly IEnumerable<SettingsData> _emptyList = new List<SettingsData>();
+    public ReadOnlyObservableCollection<SettingsData> Presets {
+      get => new ReadOnlyObservableCollection<SettingsData>(
+        new ObservableCollection<SettingsData>(
+          KnownSettings.Data.GetValueOrDefault(DisplayGame)?.Values ?? _emptyList
+        )
+      );
     }
 
     private Game _game;
     public Game DisplayGame {
       get => _game;
-      set => SetProperty(ref _game, value);
+      set {
+        if (value != Game.None && value != _game) {
+          _game = value;
+          InvokePropertyChanged(nameof(DisplayGame));
+          InvokePropertyChanged(nameof(Presets));
+          PresetComboBox.SelectedItem = null;
+        }
+      }
     }
   }
 }

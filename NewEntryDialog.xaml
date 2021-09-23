@@ -13,7 +13,6 @@
     
     <Control.Resources>
         <local:CastingConverter x:Key="DoubleCastingConverter" ResultType="{x:Type sys:Double}" />
-        <local:CastingConverter x:Key="BoolCastingConverter" ResultType="{x:Type sys:Boolean}" />
 
         <Style TargetType="{x:Type TextBlock}" BasedOn="{mah:StaticResource MahApps.Styles.TextBlock}">
             <Setter Property="FontSize"
@@ -26,28 +25,23 @@
                                     UpdateSourceTrigger=PropertyChanged}" />
         </Style>
 
-        <ObjectDataProvider x:Key="GameEnumValues" ObjectType="{x:Type sys:Enum}" MethodName="GetValues" >
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:Game"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
         <ObjectDataProvider x:Key="TypeEnumValues" ObjectType="{x:Type sys:Enum}" MethodName="GetValues" >
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="local:SettingsDataType"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </Control.Resources>
-    
-    <Grid Margin="0 10 0 0">
+
+    <Grid Margin="-20,10,-20,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
         <Grid Grid.Row="0"
-              HorizontalAlignment="Center" VerticalAlignment="Center"
-              MinWidth="200">
+              HorizontalAlignment="Center" VerticalAlignment="Center">
             <Grid.RowDefinitions>
+                <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
@@ -55,24 +49,23 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MinWidth="50"/>
                 <ColumnDefinition Width="65"/>
-                <ColumnDefinition Width="85"/>
+                <ColumnDefinition Width="120"/>
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0"
                        Margin="0,0,10,10"
                        VerticalAlignment="Center"
                        Text="Preset" />
-            <!-- TODO -->
             <ComboBox Grid.Row="0" Grid.Column="1"
                       Margin="0,0,0,10"
-                      ItemsSource="{Binding Source={StaticResource GameEnumValues}}"
+                      ItemsSource="{Binding ValidGames}"
                       SelectedValue="{Binding DisplayGame}"/>
-            <ComboBox Grid.Row="0" Grid.Column="2"
+            <ComboBox x:Name="PresetComboBox"
+                      Grid.Row="0" Grid.Column="2"
                       Margin="0,0,0,10"
-                      IsEnabled="{Binding Items.Count,
-                                          RelativeSource={RelativeSource Self},
-                                          Converter={StaticResource BoolCastingConverter},
-                                          ConverterParameter={x:Type sys:Int32}}" />
+                      ItemsSource="{Binding Presets}"
+                      DisplayMemberPath="Name"
+                      mah:TextBoxHelper.Watermark="n/a" />
 
             <TextBlock Grid.Row="1" Grid.Column="0"
                        Margin="0,0,10,0"
@@ -101,6 +94,37 @@
                       Margin="0,1,0,0"
                       ItemsSource="{Binding Source={StaticResource TypeEnumValues}}"
                       SelectedValue="{Binding Type}"/>
+            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
+                       TextWrapping="Wrap"
+                       Margin="0,3,0,0">
+                This type has not been observed in practice, so may not be written to disk correctly.
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}" BasedOn="{mah:StaticResource MahApps.Styles.TextBlock}">
+                        <Setter Property="Visibility" Value="Visible" />
+                        <Setter Property="Foreground"
+                                Value="{Binding Foreground,
+                                                RelativeSource={RelativeSource AncestorType=local:NewEntryDialog, Mode=FindAncestor},
+                                                UpdateSourceTrigger=PropertyChanged}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Type}" Value="{x:Static local:SettingsDataType.Int32}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Type}" Value="{x:Static local:SettingsDataType.String}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Type}" Value="{x:Static local:SettingsDataType.Float}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Type}" Value="{x:Static local:SettingsDataType.Blob}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Type}" Value="{x:Static local:SettingsDataType.Byte}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
         </Grid>
         <StackPanel Grid.Row="1"
                     MinHeight="85"

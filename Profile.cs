@@ -176,9 +176,7 @@ namespace bagpipe {
       return warning;
     }
 
-    public bool Save(string path) {
-      bool warning = false;
-
+    public void Save(string path) {
       byte[] compressedData;
       int decompressedSize;
 
@@ -226,21 +224,17 @@ namespace bagpipe {
             }
             // Educated guesses
             case SettingsDataType.Empty: {
-              warning = true;
               break;
             }
             case SettingsDataType.Int64: {
-              warning = true;
               WriteInt64((long)entry.Value);
               break;
             }
             case SettingsDataType.Double: {
-              warning = true;
               WriteInt64(BitConverter.DoubleToInt64Bits((double)entry.Value));
               break;
             }
             case SettingsDataType.DateTime: {
-              warning = true;
               WriteInt64(((DateTime)entry.Value).Ticks);
               break;
             }
@@ -275,8 +269,6 @@ namespace bagpipe {
       }
 
       ProfileSaved?.Invoke(this, new ProfileUpdateEventArgs(path));
-
-      return warning;
     }
   }
 }
