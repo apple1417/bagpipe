@@ -58,7 +58,7 @@
                        Text="Preset" />
             <ComboBox Grid.Row="0" Grid.Column="1"
                       Margin="0,0,0,10"
-                      ItemsSource="{Binding ValidGames}"
+                      ItemsSource="{Binding ValidGames, Mode=OneTime}"
                       SelectedValue="{Binding DisplayGame}"/>
             <ComboBox x:Name="PresetComboBox"
                       Grid.Row="0" Grid.Column="2"
@@ -92,7 +92,8 @@
                        Text="Type" />
             <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
                       Margin="0,1,0,0"
-                      ItemsSource="{Binding Source={StaticResource TypeEnumValues}}"
+                      ItemsSource="{Binding Source={StaticResource TypeEnumValues},
+                                            Mode=OneTime}"
                       SelectedValue="{Binding Type}"/>
             <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
                        TextWrapping="Wrap"

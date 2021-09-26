@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -126,6 +127,59 @@ namespace bagpipe {
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
       (bool isValid, _, byte[] converted) = TryConvertHexToByteArray((string)value);
       return isValid ? converted : DependencyProperty.UnsetValue;
+    }
+  }
+
+  class SerialByteArrayConverter : ValidationRule, IMultiValueConverter {
+    private static readonly byte[] EMPTY_SERIAL = Enumerable.Repeat((byte)0, 40).ToArray();
+
+    private static (bool isValid, string errorMsg, byte[] converted) TryConvertSerialToByteArray(string str) {
+      if (string.IsNullOrWhiteSpace(str)) {
+        return (true, null, EMPTY_SERIAL);
+      }
+      int startBracket = str.IndexOf('(');
+      int endBracket = str.IndexOf(')');
+      // They're equal if the string is empty
+      if (startBracket == -1 || endBracket == -1 || startBracket == endBracket) {
+        return (false, "Brackets are mismatched!", null);
+      }
+
+      string code = str.Substring(startBracket + 1, endBracket - startBracket - 1);
+
+      try {
+        byte[] val = System.Convert.FromBase64String(code);
+        return (true, null, val);
+      } catch (FormatException) {
+        return (false, "Serial code is invalid!", null);
+      }
+    }
+
+    public override ValidationResult Validate(object value, CultureInfo cultureInfo) {
+      (bool isValid, string errorMsg, _) = TryConvertSerialToByteArray((string)value);
+      return isValid ? ValidationResult.ValidResult : new ValidationResult(false, errorMsg);
+    }
+
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) {
+      byte[] serial = (byte[])values[0];
+      Game game = (Game)values[1];
+
+      if (serial == null || serial.All(x => x == 0)) {
+        return "";
+      }
+
+      string prefix = "BL(";
+      switch (game) {
+        case Game.BL1:
+        case Game.BL1E: prefix = "BL1("; break;
+        case Game.BL2: prefix = "BL2("; break;
+        case Game.TPS: prefix = "BLOZ("; break;
+      };
+      return prefix + System.Convert.ToBase64String(serial) + ")";
+    }
+
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) {
+      (bool isValid, _, byte[] converted) = TryConvertSerialToByteArray((string)value);
+      return new object[] { isValid ? converted : DependencyProperty.UnsetValue, Binding.DoNothing };
     }
   }
 }

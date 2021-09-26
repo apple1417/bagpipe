@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using SettingsData = bagpipe.KnownSettings.SettingsData;
 
 namespace bagpipe {
   class ProfileEntryViewModel : ViewModelBase {
@@ -25,8 +26,10 @@ namespace bagpipe {
     private void UpdateName(Game game) {
       Name = (game == Game.None)
         ? $"ID {entry.ID}"
-        : KnownSettings.Data.GetValueOrDefault(game)?.GetValueOrDefault(entry.ID).Name ?? $"Unknown ID {entry.ID}";
+        : KnownSettings.Data.GetValueOrDefault(game)?.GetValueOrDefault(entry.ID)?.Name ?? $"Unknown ID {entry.ID}";
     }
+
+    internal int ID => entry.ID;
 
     private string _name;
     public string Name {
@@ -72,12 +75,6 @@ namespace bagpipe {
     public IDropTarget DropHandler { get; }
     public ObservableCollection<ProfileEntryViewModel> Entries { get; }
 
-    private Game _displayGame;
-    public Game DisplayGame {
-      get => _displayGame;
-      set => SetProperty(ref _displayGame, value);
-    }
-
     public ProfileViewModel(Profile profile) {
       this.profile = profile;
 
@@ -87,7 +84,20 @@ namespace bagpipe {
         e => new ProfileEntryViewModel(e, this)
       );
 
-      profile.ProfileLoaded += (sender, e) => GuessDisplayGame(e.Path);
+      Entries.CollectionChanged += (sender, e) => {
+        UpdateWatchedEntries();
+      };
+
+      profile.ProfileLoaded += (sender, e) => {
+        GuessDisplayGame(e.Path);
+      };
+    }
+
+    #region Game
+    private Game _displayGame;
+    public Game DisplayGame {
+      get => _displayGame;
+      set => SetProperty(ref _displayGame, value);
     }
 
     public void GuessDisplayGame(string path) {
@@ -155,6 +165,76 @@ namespace bagpipe {
       } else {
         DisplayGame = Game.BL2;
       }
+    }
+    #endregion
+
+    #region Watched Entries
+    private Dictionary<SettingsData, PropertyChangedEventHandler> watchedEntryCallbacks = new Dictionary<SettingsData, PropertyChangedEventHandler>();
+
+    private void UpdateWatchedEntries() {
+      void UpdateWatchedEntry(SettingsData data, string property, ref ProfileEntryViewModel entry) {
+        ProfileEntryViewModel match = Entries.FirstOrDefault(x => data.Matches(x.ID, x.Type));
+        if (entry == match) {
+          return;
+        }
+
+        PropertyChangedEventHandler callback = watchedEntryCallbacks.GetValueOrDefault(data);
+        if (entry != null && callback != null) {
+          entry.PropertyChanged -= callback;
+        }
+
+        if (callback == null) {
+          callback = (sender, e) => {
+            if (e.PropertyName == nameof(ProfileEntryViewModel.Value)) {
+              InvokePropertyChanged(property);
+            }
+          };
+          watchedEntryCallbacks[data] = callback;
+        }
+
+        if (match != null) {
+          match.PropertyChanged += callback;
+        }
+        entry = match;
+        InvokePropertyChanged(property);
+      }
+
+      UpdateWatchedEntry(KnownSettings.StashSlot0, nameof(StashSlot0), ref _slashSlot0);
+      UpdateWatchedEntry(KnownSettings.StashSlot1, nameof(StashSlot1), ref _slashSlot1);
+      UpdateWatchedEntry(KnownSettings.StashSlot2, nameof(StashSlot2), ref _slashSlot2);
+      UpdateWatchedEntry(KnownSettings.StashSlot3, nameof(StashSlot3), ref _slashSlot3);
+    }
+
+    private void SetEntryProperty<T>(ProfileEntryViewModel entry, T value, [CallerMemberName]string property = null) {
+      if (property == null) {
+        throw new ArgumentNullException();
+      }
+      if (entry != null && !EqualityComparer<T>.Default.Equals((T)entry.Value, value)) {
+        entry.Value = value;
+        InvokePropertyChanged(property);
+      }
+    }
+    #endregion
+
+    private ProfileEntryViewModel _slashSlot0;
+    public byte[] StashSlot0 {
+      get => (byte[])_slashSlot0?.Value;
+      set => SetEntryProperty(_slashSlot0, value);
+    }
+    private ProfileEntryViewModel _slashSlot1;
+    public byte[] StashSlot1 {
+      get => (byte[])_slashSlot1?.Value;
+      set => SetEntryProperty(_slashSlot1, value);
+    }
+    private ProfileEntryViewModel _slashSlot2;
+    public byte[] StashSlot2 {
+      get => (byte[])_slashSlot2?.Value;
+      set => SetEntryProperty(_slashSlot2, value);
+    }
+    private ProfileEntryViewModel _slashSlot3;
+    public byte[] StashSlot3 {
+      get => (byte[])_slashSlot3?.Value;
+      set => SetEntryProperty(_slashSlot3, value);
     }
   }
 

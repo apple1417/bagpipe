@@ -12,7 +12,14 @@ namespace bagpipe {
         this.Name = Name;
         this.Type = Type;
       }
+
+      public bool Matches(int ID, SettingsDataType Type) => this.ID == ID && this.Type == Type;
     }
+
+    public static readonly SettingsData StashSlot0 = new SettingsData(130, "StashSlot0", SettingsDataType.Blob);
+    public static readonly SettingsData StashSlot1 = new SettingsData(131, "StashSlot1", SettingsDataType.Blob);
+    public static readonly SettingsData StashSlot2 = new SettingsData(132, "StashSlot2", SettingsDataType.Blob);
+    public static readonly SettingsData StashSlot3 = new SettingsData(133, "StashSlot3", SettingsDataType.Blob);
 
     public static readonly IReadOnlyDictionary<Game, IReadOnlyDictionary<int, SettingsData>> Data = new Dictionary<Game, IReadOnlyDictionary<int, SettingsData>>() {
       { Game.BL1, new Dictionary<int, SettingsData>() {
@@ -141,10 +148,10 @@ namespace bagpipe {
         { 127, new SettingsData(127, "VOVolume", SettingsDataType.Int32) },
         { 128, new SettingsData(128, "PerShotForceFeedback", SettingsDataType.Int32) },
         { 129, new SettingsData(129, "PlayerFOV", SettingsDataType.Int32) },
-        { 130, new SettingsData(130, "StashSlot0", SettingsDataType.Blob) },
-        { 131, new SettingsData(131, "StashSlot1", SettingsDataType.Blob) },
-        { 132, new SettingsData(132, "StashSlot2", SettingsDataType.Blob) },
-        { 133, new SettingsData(133, "StashSlot3", SettingsDataType.Blob) },
+        { 130, StashSlot0 },
+        { 131, StashSlot1 },
+        { 132, StashSlot2 },
+        { 133, StashSlot3 },
         { 134, new SettingsData(134, "CrouchToggle", SettingsDataType.Int32) },
         { 135, new SettingsData(135, "ZoomToggle", SettingsDataType.Int32) },
         { 136, new SettingsData(136, "BadassPoints", SettingsDataType.Int32) },
@@ -212,10 +219,10 @@ namespace bagpipe {
         { 127, new SettingsData(127, "VOVolume", SettingsDataType.Int32) },
         { 128, new SettingsData(128, "PerShotForceFeedback", SettingsDataType.Int32) },
         { 129, new SettingsData(129, "PlayerFOV", SettingsDataType.Int32) },
-        { 130, new SettingsData(130, "StashSlot0", SettingsDataType.Blob) },
-        { 131, new SettingsData(131, "StashSlot1", SettingsDataType.Blob) },
-        { 132, new SettingsData(132, "StashSlot2", SettingsDataType.Blob) },
-        { 133, new SettingsData(133, "StashSlot3", SettingsDataType.Blob) },
+        { 130, StashSlot0 },
+        { 131, StashSlot1 },
+        { 132, StashSlot2 },
+        { 133, StashSlot3 },
         { 134, new SettingsData(134, "CrouchToggle", SettingsDataType.Int32) },
         { 135, new SettingsData(135, "ZoomToggle", SettingsDataType.Int32) },
         { 136, new SettingsData(136, "BadassPoints", SettingsDataType.Int32) },
@@ -260,6 +267,5 @@ namespace bagpipe {
         { 300, new SettingsData(300, "UnlockedCustomizations_MainGame", SettingsDataType.Blob) },
       } },
     };
-
   }
 }

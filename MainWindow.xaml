@@ -22,12 +22,13 @@
     <Window.Resources>
         <local:CastingConverter x:Key="DoubleCastingConverter" ResultType="{x:Type sys:Double}" />
         <local:HexByteArrayConverter x:Key="HexByteArrayConverter" />
+        <local:SerialByteArrayConverter x:Key="SerialByteArrayConverter" />
         <local:SettingsTypeTemplateSelector x:Key="SettingsTypeTemplateSelector" />
 
         <local:BooleanToZeroWidthConverter x:Key="TypeWidthConverter" Width="{x:Static sys:Double.NaN}"/>
         <local:BooleanToZeroWidthConverter x:Key="OwnerWidthConverter" Width="{x:Static sys:Double.NaN}"/>
         <local:BooleanToZeroWidthConverter x:Key="AdvertisementWidthConverter" Width="{x:Static sys:Double.NaN}"/>
-
+        
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
         <DataTemplate x:Key="EmptySettingsTemplate">
@@ -127,6 +128,10 @@
             <Setter Property="mah:ControlsHelper.ContentCharacterCasing"
                     Value="Upper" />
         </Style>
+        <Style TargetType="{x:Type TabItem}" BasedOn="{mah:StaticResource MahApps.Styles.TabItem}">
+            <Setter Property="mah:ControlsHelper.ContentCharacterCasing"
+                    Value="Upper" />
+        </Style>
 
         <ObjectDataProvider x:Key="OwnerEnumValues" ObjectType="{x:Type sys:Enum}" MethodName="GetValues" >
             <ObjectDataProvider.MethodParameters>
@@ -151,9 +156,227 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <mah:MetroAnimatedTabControl x:Name="TabRoot" Grid.Row="0">
-            <TabItem Header="RAW" mah:ControlsHelper.ContentCharacterCasing="Upper">
-                <Grid Width="{Binding Width, ElementName=TabRoot}"
-                      Height="{Binding Height, ElementName=TabRoot}">
+            <TabItem Header="Main">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid Margin="10,10,10,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0"
+                                   Text="Customizations" />
+                        <Button Grid.Row="0" Grid.Column="1"
+                                Content="Unlock All"
+                                Margin="0,0,2.5,6"
+                                HorizontalAlignment="Stretch" />
+                        <Button Grid.Row="0" Grid.Column="2"
+                                Content="Lock All"
+                                Margin="2.5,0,0,6"
+                                HorizontalAlignment="Stretch" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0"
+                                   Text="Golden Keys" />
+                        <mah:NumericUpDown Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Margin="0,0,0,6" />
+
+                        <TextBlock Grid.Row="2" Grid.RowSpan="4" Grid.Column="0"
+                                   VerticalAlignment="Center"
+                                   Text="Stash" />
+                        <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+                                 Margin="0,0,0,1">
+                            <TextBox.Text>
+                                <MultiBinding Converter="{StaticResource SerialByteArrayConverter}">
+                                    <MultiBinding.ValidationRules>
+                                        <local:SerialByteArrayConverter />
+                                    </MultiBinding.ValidationRules>
+                                    <Binding Path="StashSlot0" />
+                                    <Binding Path="DisplayGame" Mode="OneWay" />
+                                </MultiBinding>
+                            </TextBox.Text>
+                            <TextBox.Style>
+                                <Style TargetType="{x:Type TextBox}" BasedOn="{mah:StaticResource MahApps.Styles.TextBox}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding StashSlot0}" Value="{x:Null}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+                        <TextBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"
+                                 Margin="0,0,0,1">
+                            <TextBox.Text>
+                                <MultiBinding Converter="{StaticResource SerialByteArrayConverter}">
+                                    <MultiBinding.ValidationRules>
+                                        <local:SerialByteArrayConverter />
+                                    </MultiBinding.ValidationRules>
+                                    <Binding Path="StashSlot1" />
+                                    <Binding Path="DisplayGame" Mode="OneWay" />
+                                </MultiBinding>
+                            </TextBox.Text>
+                            <TextBox.Style>
+                                <Style TargetType="{x:Type TextBox}" BasedOn="{mah:StaticResource MahApps.Styles.TextBox}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding StashSlot1}" Value="{x:Null}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+                        <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2"
+                                 Margin="0,0,0,1">
+                            <TextBox.Text>
+                                <MultiBinding Converter="{StaticResource SerialByteArrayConverter}">
+                                    <MultiBinding.ValidationRules>
+                                        <local:SerialByteArrayConverter />
+                                    </MultiBinding.ValidationRules>
+                                    <Binding Path="StashSlot2" />
+                                    <Binding Path="DisplayGame" Mode="OneWay" />
+                                </MultiBinding>
+                            </TextBox.Text>
+                            <TextBox.Style>
+                                <Style TargetType="{x:Type TextBox}" BasedOn="{mah:StaticResource MahApps.Styles.TextBox}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding StashSlot2}" Value="{x:Null}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+                        <TextBox Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2"
+                                 Margin="0,0,0,6">
+                            <TextBox.Text>
+                                <MultiBinding Converter="{StaticResource SerialByteArrayConverter}">
+                                    <MultiBinding.ValidationRules>
+                                        <local:SerialByteArrayConverter />
+                                    </MultiBinding.ValidationRules>
+                                    <Binding Path="StashSlot3" />
+                                    <Binding Path="DisplayGame" Mode="OneWay" />
+                                </MultiBinding>
+                            </TextBox.Text>
+                            <TextBox.Style>
+                                <Style TargetType="{x:Type TextBox}" BasedOn="{mah:StaticResource MahApps.Styles.TextBox}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding StashSlot3}" Value="{x:Null}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+
+                        <TextBlock Grid.Row="6" Grid.Column="0"
+                                   Text="Badass Rank" />
+                        <mah:NumericUpDown Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Margin="0,0,0,1" />
+
+                        <TextBlock Grid.Row="7" Grid.Column="0"
+                                   Text="Badass Tokens" />
+                        <mah:NumericUpDown Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Margin="0,0,0,6" />
+
+                        <TextBlock Grid.Row="8" Grid.Column="0"
+                                   Text="Critical Hit Damage" />
+                        <mah:NumericUpDown Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Margin="0,0,0,1" />
+
+                        <TextBlock Grid.Row="9" Grid.Column="0"
+                                   Text="Elemental Effect Chance" />
+                        <mah:NumericUpDown Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Margin="0,0,0,1" />
+
+                        <TextBlock Grid.Row="10" Grid.Column="0"
+                                   Text="Elemental Effect Damage" />
+                        <mah:NumericUpDown Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Margin="0,0,0,1" />
+
+                        <TextBlock Grid.Row="11" Grid.Column="0"
+                                   Text="Fire Rate" />
+                        <mah:NumericUpDown Grid.Row="11" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Margin="0,0,0,1" />
+
+                        <TextBlock Grid.Row="12" Grid.Column="0"
+                                   Text="Gun Accuracy" />
+                        <mah:NumericUpDown Grid.Row="12" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Margin="0,0,0,1" />
+
+                        <TextBlock Grid.Row="13" Grid.Column="0"
+                                   Text="Gun Damage" />
+                        <mah:NumericUpDown Grid.Row="13" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Margin="0,0,0,1" />
+
+                        <TextBlock Grid.Row="14" Grid.Column="0"
+                                   Text="Grenade Damage" />
+                        <mah:NumericUpDown Grid.Row="14" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Margin="0,0,0,1" />
+
+                        <TextBlock Grid.Row="15" Grid.Column="0"
+                                   Text="Maximum Health" />
+                        <mah:NumericUpDown Grid.Row="15" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Margin="0,0,0,1" />
+
+                        <TextBlock Grid.Row="16" Grid.Column="0"
+                                   Text="Melee Damage" />
+                        <mah:NumericUpDown Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Margin="0,0,0,1" />
+
+                        <TextBlock Grid.Row="17" Grid.Column="0"
+                                   Text="Recoil Reduction" />
+                        <mah:NumericUpDown Grid.Row="17" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Margin="0,0,0,1" />
+
+                        <TextBlock Grid.Row="18" Grid.Column="0"
+                                   Text="Reload Speed" />
+                        <mah:NumericUpDown Grid.Row="18" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Margin="0,0,0,1" />
+
+                        <TextBlock Grid.Row="19" Grid.Column="0"
+                                   Text="Shield Capacity" />
+                        <mah:NumericUpDown Grid.Row="19" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Margin="0,0,0,1" />
+
+                        <TextBlock Grid.Row="20" Grid.Column="0"
+                                   Text="Shield Recharge Delay" />
+                        <mah:NumericUpDown Grid.Row="20" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Margin="0,0,0,1" />
+
+                        <TextBlock Grid.Row="21" Grid.Column="0"
+                                   Text="Shield Recharge Rate" />
+                        <mah:NumericUpDown Grid.Row="21" Grid.Column="1" Grid.ColumnSpan="2"
+                                           Margin="0,0,0,1" />
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Raw">
+                <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
@@ -200,7 +423,8 @@
                                                           }" />
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ComboBox ItemsSource="{Binding Source={StaticResource OwnerEnumValues}}"
+                                            <ComboBox ItemsSource="{Binding Source={StaticResource OwnerEnumValues},
+                                                                            Mode=OneTime}"
                                                       SelectedValue="{Binding Owner}" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
@@ -217,9 +441,11 @@
                                                               ElementName=AdvancedSwitch,
                                                               Converter={StaticResource BooleanToVisibilityConverter}
                                                           }" />
-                                        <GridViewColumn.CellTemplate>
+                                    <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ComboBox ItemsSource="{Binding Source={StaticResource AdvertisementEnumValues}}"
+                                            <ComboBox Margin="0,0,0,1"
+                                                      ItemsSource="{Binding Source={StaticResource AdvertisementEnumValues},
+                                                                            Mode=OneTime}"
                                                       SelectedValue="{Binding AdvertisementType}" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
@@ -262,7 +488,8 @@
             <ComboBox DockPanel.Dock="Left"
                       Height="27.3" Width="64"
                       HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                      ItemsSource="{Binding Source={StaticResource GameEnumValues}}"
+                      ItemsSource="{Binding Source={StaticResource GameEnumValues},
+                                            Mode=OneTime}"
                       SelectedValue="{Binding DisplayGame}" />
             <Button DockPanel.Dock="Right"
                     Content="Save"
