@@ -182,4 +182,41 @@ namespace bagpipe {
       return new object[] { isValid ? converted : DependencyProperty.UnsetValue, Binding.DoNothing };
     }
   }
+
+  class GoldenKeyByteArrayConverter : IValueConverter {
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+      byte[] data = (byte[])value;
+      if (data == null || data.Length == 0) {
+        return 0;
+      }
+
+      long val = 0;
+      for (int i = 0; i <= (data.Length - 3); i += 3) {
+        val += data[i + 1] - data[i + 2];
+      }
+
+      return val;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+      if (value == null) {
+        return DependencyProperty.UnsetValue;
+      }
+
+      long keyNum = (long)(double)value;
+      byte[] output = new byte[3 * (((keyNum - 1) / 0xFF) + 1)];
+
+      for (int i = 0; i <= (output.Length - 3); i += 3) {
+        if (keyNum > 0xFF) {
+          output[i + 1] = 0xFF;
+          keyNum -= 0xFF;
+        } else {
+          output[i + 1] = (byte)keyNum;
+          break;
+        }
+      }
+
+      return output;
+    }
+  }
 }

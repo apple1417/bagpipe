@@ -6,8 +6,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using SettingsData = bagpipe.KnownSettings.SettingsData;
 
 namespace bagpipe {
   class ProfileEntryViewModel : ViewModelBase {
@@ -18,7 +16,7 @@ namespace bagpipe {
 
       profileVM.PropertyChanged += (sender, e) => {
         if (e.PropertyName == nameof(ProfileViewModel.DisplayGame)) {
-          UpdateName(((ProfileViewModel) sender).DisplayGame);
+          UpdateName(((ProfileViewModel)sender).DisplayGame);
         }
       };
     }
@@ -29,7 +27,10 @@ namespace bagpipe {
         : KnownSettings.Data.GetValueOrDefault(game)?.GetValueOrDefault(entry.ID)?.Name ?? $"Unknown ID {entry.ID}";
     }
 
-    internal int ID => entry.ID;
+    // These don't get setters since updating them live gets awkward
+    public int ID => entry.ID;
+    // Would also need to update data template for this
+    public SettingsDataType Type => entry.Type;
 
     private string _name;
     public string Name {
@@ -40,11 +41,6 @@ namespace bagpipe {
     public OnlineProfilePropertyOwner Owner {
       get => entry.Owner;
       set => SetProperty(ref entry.Owner, value);
-    }
-
-    public SettingsDataType Type {
-      get => entry.Type;
-      // No setter since I don't want to deal with updating templates live
     }
 
     public object Value {
@@ -86,6 +82,8 @@ namespace bagpipe {
 
       Entries.CollectionChanged += (sender, e) => {
         UpdateWatchedEntries();
+
+        InvokePropertyChanged(nameof(HasCustomizations));
       };
 
       profile.ProfileLoaded += (sender, e) => {
@@ -168,11 +166,26 @@ namespace bagpipe {
     }
     #endregion
 
-    #region Watched Entries
-    private Dictionary<SettingsData, PropertyChangedEventHandler> watchedEntryCallbacks = new Dictionary<SettingsData, PropertyChangedEventHandler>();
+    #region Customizations
+    public bool HasCustomizations => Entries.Any(x => KnownSettings.UnlockedCustomizations.Matches(x.ID, x.Type));
+
+    // TODO: Validate
+    private static readonly byte[] NO_CUSTOMIZATIONS = Enumerable.Repeat((byte)0, 1001).ToArray();
+    private static readonly byte[] ALL_CUSTOMIZATIONS = Enumerable.Repeat((byte)0xFF, 1001).ToArray();
+
+    public void UpdateCustomizations(bool unlock) {
+      ProfileEntryViewModel entry = Entries.FirstOrDefault(x => KnownSettings.UnlockedCustomizations.Matches(x.ID, x.Type));
+      if (entry != null) {
+        entry.Value = unlock ? ALL_CUSTOMIZATIONS : NO_CUSTOMIZATIONS;
+      }
+    }
+    #endregion
+
+    #region Watched Entry Updates
+    private Dictionary<KnownSettingInfo, PropertyChangedEventHandler> watchedEntryCallbacks = new Dictionary<KnownSettingInfo, PropertyChangedEventHandler>();
 
     private void UpdateWatchedEntries() {
-      void UpdateWatchedEntry(SettingsData data, string property, ref ProfileEntryViewModel entry) {
+      void UpdateWatchedEntry(KnownSettingInfo data, string property, ref ProfileEntryViewModel entry) {
         ProfileEntryViewModel match = Entries.FirstOrDefault(x => data.Matches(x.ID, x.Type));
         if (entry == match) {
           return;
@@ -199,6 +212,7 @@ namespace bagpipe {
         InvokePropertyChanged(property);
       }
 
+      UpdateWatchedEntry(KnownSettings.GoldenKeys, nameof(GoldenKeys), ref _goldenKeys);
       UpdateWatchedEntry(KnownSettings.StashSlot0, nameof(StashSlot0), ref _slashSlot0);
       UpdateWatchedEntry(KnownSettings.StashSlot1, nameof(StashSlot1), ref _slashSlot1);
       UpdateWatchedEntry(KnownSettings.StashSlot2, nameof(StashSlot2), ref _slashSlot2);
@@ -216,6 +230,15 @@ namespace bagpipe {
     }
     #endregion
 
+    #region Watched Entries
+
+    private ProfileEntryViewModel _goldenKeys;
+    public byte[] GoldenKeys {
+      get => (byte[])_goldenKeys?.Value;
+      set => SetEntryProperty(_goldenKeys, value);
+    }
+
+    #region Stash
     private ProfileEntryViewModel _slashSlot0;
     public byte[] StashSlot0 {
       get => (byte[])_slashSlot0?.Value;
@@ -236,6 +259,9 @@ namespace bagpipe {
       get => (byte[])_slashSlot3?.Value;
       set => SetEntryProperty(_slashSlot3, value);
     }
+    #endregion
+
+    #endregion
   }
 
   class ProfileDropHandler : DefaultDropHandler {

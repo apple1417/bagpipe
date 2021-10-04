@@ -23,6 +23,7 @@
         <local:CastingConverter x:Key="DoubleCastingConverter" ResultType="{x:Type sys:Double}" />
         <local:HexByteArrayConverter x:Key="HexByteArrayConverter" />
         <local:SerialByteArrayConverter x:Key="SerialByteArrayConverter" />
+        <local:GoldenKeyByteArrayConverter x:Key="GoldenKeyByteArrayConverter" />
         <local:SettingsTypeTemplateSelector x:Key="SettingsTypeTemplateSelector" />
 
         <local:BooleanToZeroWidthConverter x:Key="TypeWidthConverter" Width="{x:Static sys:Double.NaN}"/>
@@ -194,16 +195,35 @@
                         <Button Grid.Row="0" Grid.Column="1"
                                 Content="Unlock All"
                                 Margin="0,0,2.5,6"
-                                HorizontalAlignment="Stretch" />
+                                HorizontalAlignment="Stretch"
+                                IsEnabled="{Binding HasCustomizations}"
+                                Click="UnlockCustomizations_Click" />
                         <Button Grid.Row="0" Grid.Column="2"
                                 Content="Lock All"
                                 Margin="2.5,0,0,6"
-                                HorizontalAlignment="Stretch" />
+                                HorizontalAlignment="Stretch"
+                                IsEnabled="{Binding HasCustomizations}"
+                                Click="LockCustomizations_Click" />
 
                         <TextBlock Grid.Row="1" Grid.Column="0"
                                    Text="Golden Keys" />
                         <mah:NumericUpDown Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Margin="0,0,0,6" />
+                                           Margin="0,0,0,6"
+                                           Minimum="0"
+                                           Maximum="333333"
+                                           Value="{Binding GoldenKeys, Converter={StaticResource GoldenKeyByteArrayConverter}}"
+                                           NumericInputMode="Numbers"
+                                           ParsingNumberStyle="Integer,AllowThousands">
+                            <mah:NumericUpDown.Style>
+                                <Style TargetType="{x:Type mah:NumericUpDown}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding GoldenKeys}" Value="{x:Null}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </mah:NumericUpDown.Style>
+                        </mah:NumericUpDown>
 
                         <TextBlock Grid.Row="2" Grid.RowSpan="4" Grid.Column="0"
                                    VerticalAlignment="Center"

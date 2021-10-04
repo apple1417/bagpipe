@@ -1,14 +1,11 @@
-﻿using System;
-using System.ComponentModel;
-
-namespace bagpipe {
-  enum OnlineProfilePropertyOwner {
+﻿namespace bagpipe {
+  public enum OnlineProfilePropertyOwner {
     None = 0,
     OnlineService = 1,
     Game = 2,
   }
 
-  enum SettingsDataType {
+  public enum SettingsDataType {
     Empty = 0,
     Int32 = 1,
     Int64 = 2,
@@ -20,14 +17,14 @@ namespace bagpipe {
     Byte = 8
   }
 
-  enum OnlineDataAdvertisementType {
+  public enum OnlineDataAdvertisementType {
     DontAdvertise = 0,
     OnlineService = 1,
     QOS = 2,
     OnlineServiceAndQOS = 3,
   }
 
-  enum Game {
+  public enum Game {
     None,
     BL1,
     BL1E,

@@ -1,20 +1,12 @@
-﻿using System;
+﻿using MahApps.Metro.Controls.Dialogs;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using MahApps.Metro.Controls.Dialogs;
-using SettingsData = bagpipe.KnownSettings.SettingsData;
 
 namespace bagpipe {
   public partial class NewEntryDialog : CustomDialog {
@@ -93,7 +85,7 @@ namespace bagpipe {
     }
 
     private void PresetComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-      SettingsData selected = (SettingsData)PresetComboBox.SelectedItem;
+      KnownSettingInfo selected = (KnownSettingInfo)PresetComboBox.SelectedItem;
       if (selected != null) {
         ID = selected.ID;
         Type = selected.Type;
@@ -101,7 +93,7 @@ namespace bagpipe {
     }
 
     private void TryUpdatePreset() {
-      SettingsData match = KnownSettings.Data.GetValueOrDefault(DisplayGame)?.GetValueOrDefault(ID);
+      KnownSettingInfo match = KnownSettings.Data.GetValueOrDefault(DisplayGame)?.GetValueOrDefault(ID);
       if (match != null && match.Type == Type && Presets.Contains(match)) {
         PresetComboBox.SelectedItem = match;
       } else {
@@ -137,10 +129,10 @@ namespace bagpipe {
       }
     }
 
-    private static readonly IEnumerable<SettingsData> _emptyList = new List<SettingsData>();
-    public ReadOnlyObservableCollection<SettingsData> Presets {
-      get => new ReadOnlyObservableCollection<SettingsData>(
-        new ObservableCollection<SettingsData>(
+    private static readonly IEnumerable<KnownSettingInfo> _emptyList = new List<KnownSettingInfo>();
+    public ReadOnlyObservableCollection<KnownSettingInfo> Presets {
+      get => new ReadOnlyObservableCollection<KnownSettingInfo>(
+        new ObservableCollection<KnownSettingInfo>(
           KnownSettings.Data.GetValueOrDefault(DisplayGame)?.Values ?? _emptyList
         )
       );

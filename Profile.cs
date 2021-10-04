@@ -76,7 +76,7 @@ namespace bagpipe {
         }
       }
 
-      bool warning = false;
+      bool unknownData = false;
 
       using (MemoryStream ms = new MemoryStream(decompressedData)) {
         int entryCount = BinaryPrimitives.ReadInt32BigEndian(ms.ReadByteArray(4));
@@ -89,7 +89,7 @@ namespace bagpipe {
             entry.Owner != OnlineProfilePropertyOwner.Game
             && entry.Owner != OnlineProfilePropertyOwner.OnlineService
           ) {
-            warning = true;
+            unknownData = true;
           }
 
           entry.ID = BinaryPrimitives.ReadInt32BigEndian(ms.ReadByteArray(4));
@@ -122,16 +122,16 @@ namespace bagpipe {
             }
             // Haven't encountered these in practice, but can make decent educated guesses
             case SettingsDataType.Empty: {
-              warning = true;
+              unknownData = true;
               break;
             }
             case SettingsDataType.Int64: {
-              warning = true;
+              unknownData = true;
               entry.Value = BinaryPrimitives.ReadInt64BigEndian(ms.ReadByteArray(8));
               break;
             }
             case SettingsDataType.Double: {
-              warning = true;
+              unknownData = true;
               entry.Value = BitConverter.Int64BitsToDouble(
                 BinaryPrimitives.ReadInt64BigEndian(ms.ReadByteArray(8))
               );
@@ -148,39 +148,39 @@ namespace bagpipe {
             In practice, nothing ever sets values of this type, so doesn't really matter if this is wrong
             */
             case SettingsDataType.DateTime: {
-              warning = true;
+              unknownData = true;
               entry.Value = new DateTime(BinaryPrimitives.ReadInt64BigEndian(ms.ReadByteArray(8)));
               break;
             }
             default: {
-              warning = true;
+              unknownData = true;
               break;
             }
           }
 
           entry.AdvertisementType = (OnlineDataAdvertisementType)ms.ReadByteSafe();
           if (entry.AdvertisementType != OnlineDataAdvertisementType.DontAdvertise) {
-            warning = true;
+            unknownData = true;
           }
 
           Entries.Add(entry);
         }
 
         if (ms.Position != ms.Length) {
-          warning = true;
+          unknownData = true;
         }
       }
 
       ProfileLoaded?.Invoke(this, new ProfileUpdateEventArgs(path));
 
-      return warning;
+      return unknownData;
     }
 
     public void Save(string path) {
       byte[] compressedData;
       int decompressedSize;
 
-      using(MemoryStream ms = new MemoryStream()) {
+      using (MemoryStream ms = new MemoryStream()) {
         void WriteInt32(int val) {
           byte[] buf = new byte[4];
           BinaryPrimitives.WriteInt32BigEndian(buf, val);
@@ -246,6 +246,7 @@ namespace bagpipe {
           ms.WriteByte((byte)entry.AdvertisementType);
         }
 
+        // TODO: warn when above 9000 bytes
         decompressedSize = (int)ms.Length;
         try {
           compressedData = LZO.Compress(ms.GetBuffer(), 0, decompressedSize);

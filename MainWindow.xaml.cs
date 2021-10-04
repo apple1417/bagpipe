@@ -22,13 +22,6 @@ namespace bagpipe {
   public partial class MainWindow : MetroWindow {
     private readonly Profile profile;
 
-    private readonly OpenFileDialog openDialog = new OpenFileDialog() {
-      Filter = "Profile Files|profile.bin;Player.wsg|All Files (*.*)|*.*"
-    };
-    private readonly SaveFileDialog saveDialog = new SaveFileDialog() {
-      Filter = "Profile Files|profile.bin;Player.wsg"
-    };
-
     public MainWindow() {
       InitializeComponent();
 
@@ -41,9 +34,18 @@ namespace bagpipe {
       DataContext = new ProfileViewModel(profile);
     }
 
+    #region File Handling
+    private readonly OpenFileDialog openDialog = new OpenFileDialog() {
+      Filter = "Profile Files|profile.bin;Player.wsg|All Files (*.*)|*.*"
+    };
+    private readonly SaveFileDialog saveDialog = new SaveFileDialog() {
+      Filter = "Profile Files|profile.bin;Player.wsg"
+    };
+
     private void OpenButton_Click(object sender, RoutedEventArgs e) {
       bool? ok = openDialog.ShowDialog();
       if (ok.HasValue && ok.Value) {
+        // TODO: processing dialog
         bool warn = profile.Load(openDialog.FileName);
         if (warn) {
           _ = this.ShowMessageAsync(
@@ -57,10 +59,13 @@ namespace bagpipe {
     private void SaveButton_Click(object sender, RoutedEventArgs e) {
       bool? ok = saveDialog.ShowDialog();
       if (ok.HasValue && ok.Value) {
+        // TODO: processing dialog
         profile.Save(saveDialog.FileName);
       }
     }
+    #endregion
 
+    #region Entry Manipulation
     private async void NewButton_Click(object sender, RoutedEventArgs e) {
       NewEntryDialog dialog = new NewEntryDialog(((ProfileViewModel)DataContext).DisplayGame);
       await this.ShowMetroDialogAsync(dialog);
@@ -93,5 +98,9 @@ namespace bagpipe {
         e.Handled |= DeleteRawEntries();
       }
     }
+    #endregion
+
+    private void UnlockCustomizations_Click(object sender, RoutedEventArgs e) => ((ProfileViewModel)DataContext).UpdateCustomizations(true);
+    private void LockCustomizations_Click(object sender, RoutedEventArgs e) => ((ProfileViewModel)DataContext).UpdateCustomizations(false);
   }
 }
