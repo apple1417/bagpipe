@@ -316,12 +316,57 @@
                         <TextBlock Grid.Row="6" Grid.Column="0"
                                    Text="Badass Rank" />
                         <mah:NumericUpDown Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Margin="0,0,0,1" />
+                                           Margin="0,0,0,1"
+                                           Minimum="0"
+                                           Maximum="429496729"
+                                           Value="{Binding BadassRank,
+                                                           Converter={StaticResource DoubleCastingConverter},
+                                                           ConverterParameter={x:Type sys:Int32}}"
+                                           NumericInputMode="Numbers"
+                                           ParsingNumberStyle="Integer,AllowThousands">
+                            <mah:NumericUpDown.Style>
+                                <Style TargetType="{x:Type mah:NumericUpDown}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding BadassRank}" Value="{x:Null}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                        <!-- BL1E uses it's own fields with the same ids which we can't distinguish -->
+                                        <DataTrigger Binding="{Binding DisplayGame}" Value="{x:Static local:Game.BL1E}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </mah:NumericUpDown.Style>
+                        </mah:NumericUpDown>
 
                         <TextBlock Grid.Row="7" Grid.Column="0"
                                    Text="Badass Tokens" />
                         <mah:NumericUpDown Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Margin="0,0,0,6" />
+                                           Margin="0,0,0,6"
+                                           Minimum="0"
+                                           Maximum="{Binding Source={x:Static sys:Int32.MaxValue},
+                                                             Mode=OneTime,
+                                                             Converter={StaticResource DoubleCastingConverter},
+                                                             ConverterParameter={x:Type sys:Int32}}"
+                                           Value="{Binding BadassTokens,
+                                                           Converter={StaticResource DoubleCastingConverter},
+                                                           ConverterParameter={x:Type sys:Int32}}"
+                                           NumericInputMode="Numbers"
+                                           ParsingNumberStyle="Integer,AllowThousands">
+                            <mah:NumericUpDown.Style>
+                                <Style TargetType="{x:Type mah:NumericUpDown}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding BadassTokens}" Value="{x:Null}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                        <!-- BL1E uses it's own fields with the same ids which we can't distinguish -->
+                                        <DataTrigger Binding="{Binding DisplayGame}" Value="{x:Static local:Game.BL1E}">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </mah:NumericUpDown.Style>
+                        </mah:NumericUpDown>
 
                         <TextBlock Grid.Row="8" Grid.Column="0"
                                    Text="Critical Hit Damage" />

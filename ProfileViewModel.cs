@@ -217,13 +217,16 @@ namespace bagpipe {
       UpdateWatchedEntry(KnownSettings.StashSlot1, nameof(StashSlot1), ref _slashSlot1);
       UpdateWatchedEntry(KnownSettings.StashSlot2, nameof(StashSlot2), ref _slashSlot2);
       UpdateWatchedEntry(KnownSettings.StashSlot3, nameof(StashSlot3), ref _slashSlot3);
+      UpdateWatchedEntry(KnownSettings.BadassPoints, nameof(BadassRank), ref _badassPoints);
+      UpdateWatchedEntry(KnownSettings.BadassPointsSpent, nameof(BadassRank), ref _badassPointsSpent);
+      UpdateWatchedEntry(KnownSettings.BadassTokens, nameof(BadassTokens), ref _badassTokens);
     }
 
     private void SetEntryProperty<T>(ProfileEntryViewModel entry, T value, [CallerMemberName]string property = null) {
       if (property == null) {
         throw new ArgumentNullException();
       }
-      if (entry != null && !EqualityComparer<T>.Default.Equals((T)entry.Value, value)) {
+      if (entry != null && value != null && !EqualityComparer<T>.Default.Equals((T)entry.Value, value)) {
         entry.Value = value;
         InvokePropertyChanged(property);
       }
@@ -260,6 +263,39 @@ namespace bagpipe {
       set => SetEntryProperty(_slashSlot3, value);
     }
     #endregion
+
+    private const int BADASS_POINTS_PER_RANK = 5;
+    private ProfileEntryViewModel _badassPoints;
+    private ProfileEntryViewModel _badassPointsSpent;
+    public int? BadassRank {
+      get => _badassPoints == null ? null : (int?)((int)_badassPoints.Value / BADASS_POINTS_PER_RANK);
+      set {
+        if (value == null) {
+          return;
+        }
+        int rank = (int)value * BADASS_POINTS_PER_RANK;
+
+        bool anyChange = false;
+        if (_badassPoints != null && (int)_badassPoints.Value != rank) {
+          anyChange = true;
+          _badassPoints.Value = rank;
+        }
+        if (_badassPointsSpent != null && (int)_badassPointsSpent.Value != rank) {
+          anyChange = true;
+          _badassPointsSpent.Value = rank;
+        }
+
+        if (anyChange) {
+          InvokePropertyChanged();
+        }
+      }
+    }
+
+    private ProfileEntryViewModel _badassTokens;
+    public int? BadassTokens {
+      get => (int?)_badassTokens?.Value;
+      set => SetEntryProperty(_badassTokens, value);
+    }
 
     #endregion
   }

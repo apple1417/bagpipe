@@ -96,6 +96,7 @@ namespace bagpipe {
           entry.Type = (SettingsDataType)ms.ReadByteSafe();
 
           switch (entry.Type) {
+            // This is signed (confirmed via testing badass rank)
             case SettingsDataType.Int32: {
               entry.Value = BinaryPrimitives.ReadInt32BigEndian(ms.ReadByteArray(4));
               break;

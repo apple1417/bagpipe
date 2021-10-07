@@ -23,6 +23,9 @@ namespace bagpipe {
     public static readonly KnownSettingInfo StashSlot1 = new KnownSettingInfo(131, "StashSlot1", SettingsDataType.Blob);
     public static readonly KnownSettingInfo StashSlot2 = new KnownSettingInfo(132, "StashSlot2", SettingsDataType.Blob);
     public static readonly KnownSettingInfo StashSlot3 = new KnownSettingInfo(133, "StashSlot3", SettingsDataType.Blob);
+    public static readonly KnownSettingInfo BadassPoints = new KnownSettingInfo(136, "BadassPoints", SettingsDataType.Int32);
+    public static readonly KnownSettingInfo BadassPointsSpent = new KnownSettingInfo(137, "BadassPointsSpent", SettingsDataType.Int32);
+    public static readonly KnownSettingInfo BadassTokens = new KnownSettingInfo(138, "BadassTokens", SettingsDataType.Int32);
 
     public static readonly IReadOnlyDictionary<Game, IReadOnlyDictionary<int, KnownSettingInfo>> Data = new Dictionary<Game, IReadOnlyDictionary<int, KnownSettingInfo>>() {
       { Game.BL1, new Dictionary<int, KnownSettingInfo>() {
@@ -157,9 +160,9 @@ namespace bagpipe {
         { 133, StashSlot3 },
         { 134, new KnownSettingInfo(134, "CrouchToggle", SettingsDataType.Int32) },
         { 135, new KnownSettingInfo(135, "ZoomToggle", SettingsDataType.Int32) },
-        { 136, new KnownSettingInfo(136, "BadassPoints", SettingsDataType.Int32) },
-        { 137, new KnownSettingInfo(137, "BadassPointsSpent", SettingsDataType.Int32) },
-        { 138, new KnownSettingInfo(138, "BadassTokens", SettingsDataType.Int32) },
+        { 136, BadassPoints },
+        { 137, BadassPointsSpent },
+        { 138, BadassTokens },
         { 139, new KnownSettingInfo(139, "BadassTokensEarned", SettingsDataType.Int32) },
         { 140, new KnownSettingInfo(140, "AbsoluteMinimap", SettingsDataType.Int32) },
         { 141, new KnownSettingInfo(141, "HUDScaleX", SettingsDataType.Int32) },
@@ -228,9 +231,9 @@ namespace bagpipe {
         { 133, StashSlot3 },
         { 134, new KnownSettingInfo(134, "CrouchToggle", SettingsDataType.Int32) },
         { 135, new KnownSettingInfo(135, "ZoomToggle", SettingsDataType.Int32) },
-        { 136, new KnownSettingInfo(136, "BadassPoints", SettingsDataType.Int32) },
-        { 137, new KnownSettingInfo(137, "BadassPointsSpent", SettingsDataType.Int32) },
-        { 138, new KnownSettingInfo(138, "BadassTokens", SettingsDataType.Int32) },
+        { 136, BadassPoints },
+        { 137, BadassPointsSpent },
+        { 138, BadassTokens },
         { 139, new KnownSettingInfo(139, "BadassTokensEarned", SettingsDataType.Int32) },
         { 140, new KnownSettingInfo(140, "AbsoluteMinimap", SettingsDataType.Int32) },
         { 141, new KnownSettingInfo(141, "HUDScaleX", SettingsDataType.Int32) },
