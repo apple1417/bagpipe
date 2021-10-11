@@ -43,6 +43,7 @@ namespace bagpipe {
     };
 
     private void OpenButton_Click(object sender, RoutedEventArgs e) {
+      // TODO: possibly crashing when something has a lock on file?
       bool? ok = openDialog.ShowDialog();
       if (ok.HasValue && ok.Value) {
         // TODO: processing dialog

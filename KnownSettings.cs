@@ -18,11 +18,16 @@ namespace bagpipe {
 
   static class KnownSettings {
     public static readonly KnownSettingInfo UnlockedCustomizations = new KnownSettingInfo(300, "UnlockedCustomizations_MainGame", SettingsDataType.Blob);
-    public static readonly KnownSettingInfo GoldenKeys = new KnownSettingInfo(162, "GoldenKeysEarned", SettingsDataType.Blob);
-    public static readonly KnownSettingInfo StashSlot0 = new KnownSettingInfo(130, "StashSlot0", SettingsDataType.Blob);
+
+    public static readonly KnownSettingInfo GoldenKeysEarned = new KnownSettingInfo(162, "GoldenKeysEarned", SettingsDataType.Blob);
+    public static readonly KnownSettingInfo keyCount = new KnownSettingInfo(130, "keyCount", SettingsDataType.Int32);
+    public static readonly KnownSettingInfo keysSpent = new KnownSettingInfo(131, "keysSpent", SettingsDataType.Int32);
+
+    public static readonly KnownSettingInfo StashSlot0 = new KnownSettingInfo(130, "StashSlot0", SettingsDataType.Blob); // Different data type than keyCount
     public static readonly KnownSettingInfo StashSlot1 = new KnownSettingInfo(131, "StashSlot1", SettingsDataType.Blob);
     public static readonly KnownSettingInfo StashSlot2 = new KnownSettingInfo(132, "StashSlot2", SettingsDataType.Blob);
     public static readonly KnownSettingInfo StashSlot3 = new KnownSettingInfo(133, "StashSlot3", SettingsDataType.Blob);
+
     public static readonly KnownSettingInfo BadassPoints = new KnownSettingInfo(136, "BadassPoints", SettingsDataType.Int32);
     public static readonly KnownSettingInfo BadassPointsSpent = new KnownSettingInfo(137, "BadassPointsSpent", SettingsDataType.Int32);
     public static readonly KnownSettingInfo BadassTokens = new KnownSettingInfo(138, "BadassTokens", SettingsDataType.Int32);
@@ -92,8 +97,8 @@ namespace bagpipe {
         { 127, new KnownSettingInfo(127, "ShowMinimap", SettingsDataType.Int32) },
         { 128, new KnownSettingInfo(128, "HDR", SettingsDataType.Int32) },
         { 129, new KnownSettingInfo(129, "FOV", SettingsDataType.Int32) },
-        { 130, new KnownSettingInfo(130, "keyCount", SettingsDataType.Int32) },
-        { 131, new KnownSettingInfo(131, "keysSpent", SettingsDataType.Int32) },
+        { 130, keyCount },
+        { 131, keysSpent },
         { 132, new KnownSettingInfo(132, "EulaAccepted", SettingsDataType.Int32) },
         { 134, new KnownSettingInfo(134, "ShotsFired", SettingsDataType.Int32) },
         { 135, new KnownSettingInfo(135, "TotalKills", SettingsDataType.Int32) },
@@ -184,7 +189,7 @@ namespace bagpipe {
         { 159, new KnownSettingInfo(159, "GunzerkingAutoSwitch", SettingsDataType.Byte) },
         { 160, new KnownSettingInfo(160, "EasterEggOption", SettingsDataType.Byte) },
         { 161, new KnownSettingInfo(161, "RewardedForPlayingPreviousGame", SettingsDataType.Int32) },
-        { 162, GoldenKeys },
+        { 162, GoldenKeysEarned },
         { 163, new KnownSettingInfo(163, "DisableUISway", SettingsDataType.Byte) },
         { 164, new KnownSettingInfo(164, "BadassRewardsToOfferNext", SettingsDataType.String) },
         { 165, new KnownSettingInfo(165, "InvertedReverseSteering", SettingsDataType.Byte) },
@@ -255,7 +260,7 @@ namespace bagpipe {
         { 159, new KnownSettingInfo(159, "GunzerkingAutoSwitch", SettingsDataType.Byte) },
         { 160, new KnownSettingInfo(160, "EasterEggOption", SettingsDataType.Byte) },
         { 161, new KnownSettingInfo(161, "RewardedForPlayingPreviousGame", SettingsDataType.Int32) },
-        { 162, GoldenKeys },
+        { 162, GoldenKeysEarned },
         { 163, new KnownSettingInfo(163, "DisableUISway", SettingsDataType.Byte) },
         { 164, new KnownSettingInfo(164, "BadassRewardsToOfferNext", SettingsDataType.String) },
         { 165, new KnownSettingInfo(165, "InvertedReverseSteering", SettingsDataType.Byte) },

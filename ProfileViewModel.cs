@@ -212,11 +212,17 @@ namespace bagpipe {
         InvokePropertyChanged(property);
       }
 
-      UpdateWatchedEntry(KnownSettings.GoldenKeys, nameof(GoldenKeys), ref _goldenKeys);
+      // We're firing events a bit more than we have to here, but ehh
+      UpdateWatchedEntry(KnownSettings.GoldenKeysEarned, nameof(GoldenKeys), ref _goldenKeysEarned);
+      UpdateWatchedEntry(KnownSettings.keyCount, nameof(GoldenKeys), ref _keyCount);
+      UpdateWatchedEntry(KnownSettings.keysSpent, nameof(GoldenKeys), ref _keysSpent);
+      InvokePropertyChanged(nameof(MaxGoldenKeys));
+
       UpdateWatchedEntry(KnownSettings.StashSlot0, nameof(StashSlot0), ref _slashSlot0);
       UpdateWatchedEntry(KnownSettings.StashSlot1, nameof(StashSlot1), ref _slashSlot1);
       UpdateWatchedEntry(KnownSettings.StashSlot2, nameof(StashSlot2), ref _slashSlot2);
       UpdateWatchedEntry(KnownSettings.StashSlot3, nameof(StashSlot3), ref _slashSlot3);
+
       UpdateWatchedEntry(KnownSettings.BadassPoints, nameof(BadassRank), ref _badassPoints);
       UpdateWatchedEntry(KnownSettings.BadassPointsSpent, nameof(BadassRank), ref _badassPointsSpent);
       UpdateWatchedEntry(KnownSettings.BadassTokens, nameof(BadassTokens), ref _badassTokens);
@@ -235,11 +241,77 @@ namespace bagpipe {
 
     #region Watched Entries
 
-    private ProfileEntryViewModel _goldenKeys;
-    public byte[] GoldenKeys {
-      get => (byte[])_goldenKeys?.Value;
-      set => SetEntryProperty(_goldenKeys, value);
+    #region Golden Keys
+    private ProfileEntryViewModel _goldenKeysEarned;
+    private ProfileEntryViewModel _keyCount;
+    private ProfileEntryViewModel _keysSpent;
+
+    private int? _bl1eKeys => _keyCount == null
+                            ? null
+                            : (int?)_keyCount.Value - Math.Max(0, (int)(_keysSpent?.Value ?? 0));
+    // TODO: does this need caching?
+    private int? _bl2Keys {
+      get {
+        if (_goldenKeysEarned == null) {
+          return null;
+        }
+
+        byte[] keyBytes = (byte[])_goldenKeysEarned.Value;
+
+        int sum = 0;
+        for (int i = 0; i <= (keyBytes.Length - 3); i += 3) {
+          sum += keyBytes[i + 1] - keyBytes[i + 2];
+        }
+
+        return sum;
+      }
     }
+
+    // When we have BL2 style keys, use a conservative max to avoid 9000 byte limit
+    public int MaxGoldenKeys => _goldenKeysEarned != null ? 333333 : int.MaxValue;
+
+    public int? GoldenKeys {
+      // If we're in BL1E, and we have BL1E style keys, prefer those, otherwise prefer BL2 style keys
+      get => DisplayGame == Game.BL1E && _keyCount != null
+             ? _bl1eKeys
+             : _bl2Keys ?? _bl1eKeys;
+      set {
+        if (value == null) {
+          return;
+        }
+
+        // Set both key styles
+        bool anyChange = false;
+        if (_keyCount != null && value != _bl1eKeys) {
+          anyChange = true;
+          _keyCount.Value = value + Math.Max(0, (int)(_keysSpent?.Value ?? 0));
+        }
+
+        if (_goldenKeysEarned != null && value != _bl2Keys) {
+          anyChange = true;
+
+          int keyNum = (int)value;
+          byte[] output = new byte[3 * (((keyNum - 1) / 0xFF) + 1)];
+
+          for (int i = 0; i <= (output.Length - 3); i += 3) {
+            if (keyNum > 0xFF) {
+              output[i + 1] = 0xFF;
+              keyNum -= 0xFF;
+            } else {
+              output[i + 1] = (byte)keyNum;
+              break;
+            }
+          }
+
+          _goldenKeysEarned.Value = output;
+        }
+
+        if (anyChange) {
+          InvokePropertyChanged();
+        }
+      }
+    }
+    #endregion
 
     #region Stash
     private ProfileEntryViewModel _slashSlot0;
