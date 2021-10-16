@@ -63,90 +63,92 @@ namespace bagpipe {
         e.Handled = true;
       }
     }
-  }
 
-  class NewEntryViewModel: ViewModelBase {
-    public static ReadOnlyObservableCollection<Game> ValidGames { get; } = new ReadOnlyObservableCollection<Game>(
-      new ObservableCollection<Game>(
-        Enum.GetValues(typeof(Game)).Cast<Game>().Where(x => x != Game.None)
-      )
-    );
-
-    private readonly ProfileEntry Entry;
-    private ComboBox PresetComboBox;
-    public NewEntryViewModel(ProfileEntry Entry, Game DisplayGame, ComboBox PresetComboBox) {
-      this.Entry = Entry;
-      this.PresetComboBox = PresetComboBox;
-
-      // Default to TPS cause it has the most known fields
-      this.DisplayGame = DisplayGame == Game.None ? Game.TPS : DisplayGame;
-
-      PresetComboBox.SelectionChanged += PresetComboBox_SelectionChanged;
-    }
-
-    private void PresetComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-      KnownSettingInfo selected = (KnownSettingInfo)PresetComboBox.SelectedItem;
-      if (selected != null) {
-        ID = selected.ID;
-        Type = selected.Type;
-      }
-    }
-
-    private void TryUpdatePreset() {
-      KnownSettingInfo match = KnownSettings.Data.GetValueOrDefault(DisplayGame)?.GetValueOrDefault(ID);
-      if (match != null && match.Type == Type && Presets.Contains(match)) {
-        PresetComboBox.SelectedItem = match;
-      } else {
-        PresetComboBox.SelectedItem = null;
-      }
-    }
-
-    public int ID {
-      get => Entry.ID;
-      set {
-        SetProperty(ref Entry.ID, value);
-        TryUpdatePreset();
-      }
-    }
-
-    public SettingsDataType Type {
-      get => Entry.Type;
-      set {
-        SetProperty(ref Entry.Type, value);
-        Entry.Value = value switch {
-          SettingsDataType.Empty => null,
-          SettingsDataType.Int32 => 0,
-          SettingsDataType.Int64 => 0L,
-          SettingsDataType.Double => 0.0d,
-          SettingsDataType.String => "",
-          SettingsDataType.Float => 0.0f,
-          SettingsDataType.Blob => new byte[0],
-          SettingsDataType.DateTime => DateTime.Now,
-          SettingsDataType.Byte => (byte)0,
-          _ => throw new NotImplementedException(),
-        };
-        TryUpdatePreset();
-      }
-    }
-
-    private static readonly IEnumerable<KnownSettingInfo> _emptyList = new List<KnownSettingInfo>();
-    public ReadOnlyObservableCollection<KnownSettingInfo> Presets {
-      get => new ReadOnlyObservableCollection<KnownSettingInfo>(
-        new ObservableCollection<KnownSettingInfo>(
-          KnownSettings.Data.GetValueOrDefault(DisplayGame)?.Values ?? _emptyList
+    // Not the biggest fan of splitting this into another class, but we can't do multiple inheritance
+    // The way I'm dealing with presets is probably horrible, but it works, and this is private anyway
+    private class NewEntryViewModel : ViewModelBase {
+      public static ReadOnlyObservableCollection<Game> ValidGames { get; } = new ReadOnlyObservableCollection<Game>(
+        new ObservableCollection<Game>(
+          Enum.GetValues(typeof(Game)).Cast<Game>().Where(x => x != Game.None)
         )
       );
-    }
 
-    private Game _game;
-    public Game DisplayGame {
-      get => _game;
-      set {
-        if (value != Game.None && value != _game) {
-          _game = value;
-          InvokePropertyChanged(nameof(DisplayGame));
-          InvokePropertyChanged(nameof(Presets));
+      private readonly ProfileEntry Entry;
+      private ComboBox PresetComboBox;
+      public NewEntryViewModel(ProfileEntry Entry, Game DisplayGame, ComboBox PresetComboBox) {
+        this.Entry = Entry;
+        this.PresetComboBox = PresetComboBox;
+
+        // Default to TPS cause it has the most known fields
+        this.DisplayGame = DisplayGame == Game.None ? Game.TPS : DisplayGame;
+
+        PresetComboBox.SelectionChanged += PresetComboBox_SelectionChanged;
+      }
+
+      private void PresetComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+        KnownSettingInfo selected = (KnownSettingInfo)PresetComboBox.SelectedItem;
+        if (selected != null) {
+          ID = selected.ID;
+          Type = selected.Type;
+        }
+      }
+
+      private void TryUpdatePreset() {
+        KnownSettingInfo match = KnownSettings.ByGame.GetValueOrDefault(DisplayGame)?.GetValueOrDefault(ID);
+        if (match != null && match.Type == Type && Presets.Contains(match)) {
+          PresetComboBox.SelectedItem = match;
+        } else {
           PresetComboBox.SelectedItem = null;
+        }
+      }
+
+      public int ID {
+        get => Entry.ID;
+        set {
+          SetProperty(ref Entry.ID, value);
+          TryUpdatePreset();
+        }
+      }
+
+      public SettingsDataType Type {
+        get => Entry.Type;
+        set {
+          SetProperty(ref Entry.Type, value);
+          Entry.Value = value switch {
+            SettingsDataType.Empty => null,
+            SettingsDataType.Int32 => 0,
+            SettingsDataType.Int64 => 0L,
+            SettingsDataType.Double => 0.0d,
+            SettingsDataType.String => "",
+            SettingsDataType.Float => 0.0f,
+            SettingsDataType.Blob => new byte[0],
+            SettingsDataType.DateTime => DateTime.Now,
+            SettingsDataType.Byte => (byte)0,
+            _ => throw new NotImplementedException(),
+          };
+          TryUpdatePreset();
+        }
+      }
+
+      private static readonly IEnumerable<KnownSettingInfo> _emptyList = new List<KnownSettingInfo>();
+      public ReadOnlyObservableCollection<KnownSettingInfo> Presets {
+        get => new ReadOnlyObservableCollection<KnownSettingInfo>(
+          new ObservableCollection<KnownSettingInfo>(
+            KnownSettings.ByGame.GetValueOrDefault(DisplayGame)?.Values ?? _emptyList
+          )
+        );
+      }
+
+      private Game _game;
+      public Game DisplayGame {
+        get => _game;
+        set {
+          if (value != Game.None && value != _game) {
+            _game = value;
+            InvokePropertyChanged(nameof(DisplayGame));
+            InvokePropertyChanged(nameof(Presets));
+            PresetComboBox.SelectedItem = null;
+          }
         }
       }
     }

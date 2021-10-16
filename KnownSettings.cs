@@ -32,7 +32,7 @@ namespace bagpipe {
     public static readonly KnownSettingInfo BadassPointsSpent = new KnownSettingInfo(137, "BadassPointsSpent", SettingsDataType.Int32);
     public static readonly KnownSettingInfo BadassTokens = new KnownSettingInfo(138, "BadassTokens", SettingsDataType.Int32);
 
-    public static readonly IReadOnlyDictionary<Game, IReadOnlyDictionary<int, KnownSettingInfo>> Data = new Dictionary<Game, IReadOnlyDictionary<int, KnownSettingInfo>>() {
+    public static readonly IReadOnlyDictionary<Game, IReadOnlyDictionary<int, KnownSettingInfo>> ByGame = new Dictionary<Game, IReadOnlyDictionary<int, KnownSettingInfo>>() {
       { Game.BL1, new Dictionary<int, KnownSettingInfo>() {
         { 2, new KnownSettingInfo(2, "InvertLook", SettingsDataType.Int32) },
         { 16, new KnownSettingInfo(16, "AutoAim", SettingsDataType.Int32) },

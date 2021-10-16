@@ -10,7 +10,7 @@ namespace bagpipe {
     [DllImport("minilzo.dll", CallingConvention=CallingConvention.Cdecl)]
     private static extern int lzo1x_decompress_safe(IntPtr src, uint src_len, IntPtr dst, ref uint dst_len, IntPtr wrkmem);
 
-    private static IntPtr workMem = Marshal.AllocHGlobal(16384);
+    private static readonly IntPtr workMem = Marshal.AllocHGlobal(16384);
 
     public static byte[] Compress(byte[] data, int offset, int len) {
       IntPtr srcPtr = Marshal.AllocHGlobal(len);
