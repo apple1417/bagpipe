@@ -371,75 +371,147 @@
                             </mah:NumericUpDown.Style>
                         </mah:NumericUpDown>
 
+                        <!-- TODO: rearrange to same order as game -->
                         <TextBlock Grid.Row="8" Grid.Column="0"
                                    Text="Critical Hit Damage" />
                         <mah:NumericUpDown Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Margin="0,0,0,1" />
+                                           Margin="0,0,0,1"
+                                           IsEnabled="{Binding HasBarRewards}"
+                                           Value="{Binding CritDamage}"
+                                           NumericInputMode="Decimal"
+                                           ParsingNumberStyle="Number" 
+                                           StringFormat="F1"/>
+
 
                         <TextBlock Grid.Row="9" Grid.Column="0"
                                    Text="Elemental Effect Chance" />
                         <mah:NumericUpDown Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Margin="0,0,0,1" />
+                                           Margin="0,0,0,1"
+                                           IsEnabled="{Binding HasBarRewards}"
+                                           Value="{Binding ElementalChance}"
+                                           NumericInputMode="Decimal"
+                                           ParsingNumberStyle="Number" 
+                                           StringFormat="F1" />
 
                         <TextBlock Grid.Row="10" Grid.Column="0"
                                    Text="Elemental Effect Damage" />
                         <mah:NumericUpDown Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Margin="0,0,0,1" />
+                                           Margin="0,0,0,1"
+                                           IsEnabled="{Binding HasBarRewards}"
+                                           Value="{Binding ElementalDamage}"
+                                           NumericInputMode="Decimal"
+                                           ParsingNumberStyle="Number" 
+                                           StringFormat="F1" />
 
                         <TextBlock Grid.Row="11" Grid.Column="0"
                                    Text="Fire Rate" />
                         <mah:NumericUpDown Grid.Row="11" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Margin="0,0,0,1" />
+                                           Margin="0,0,0,1"
+                                           IsEnabled="{Binding HasBarRewards}"
+                                           Value="{Binding FireRate}"
+                                           NumericInputMode="Decimal"
+                                           ParsingNumberStyle="Number" 
+                                           StringFormat="F1" />
 
                         <TextBlock Grid.Row="12" Grid.Column="0"
                                    Text="Gun Accuracy" />
                         <mah:NumericUpDown Grid.Row="12" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Margin="0,0,0,1" />
+                                           Margin="0,0,0,1"
+                                           IsEnabled="{Binding HasBarRewards}"
+                                           Value="{Binding GunAccuracy}"
+                                           NumericInputMode="Decimal"
+                                           ParsingNumberStyle="Number" 
+                                           StringFormat="F1" />
 
                         <TextBlock Grid.Row="13" Grid.Column="0"
                                    Text="Gun Damage" />
                         <mah:NumericUpDown Grid.Row="13" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Margin="0,0,0,1" />
+                                           Margin="0,0,0,1"
+                                           IsEnabled="{Binding HasBarRewards}"
+                                           Value="{Binding GunDamage}"
+                                           NumericInputMode="Decimal"
+                                           ParsingNumberStyle="Number" 
+                                           StringFormat="F1" />
 
                         <TextBlock Grid.Row="14" Grid.Column="0"
                                    Text="Grenade Damage" />
                         <mah:NumericUpDown Grid.Row="14" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Margin="0,0,0,1" />
+                                           Margin="0,0,0,1"
+                                           IsEnabled="{Binding HasBarRewards}"
+                                           Value="{Binding GrenadeDamage}"
+                                           NumericInputMode="Decimal"
+                                           ParsingNumberStyle="Number" 
+                                           StringFormat="F1" />
 
                         <TextBlock Grid.Row="15" Grid.Column="0"
                                    Text="Maximum Health" />
                         <mah:NumericUpDown Grid.Row="15" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Margin="0,0,0,1" />
+                                           Margin="0,0,0,1"
+                                           IsEnabled="{Binding HasBarRewards}"
+                                           Value="{Binding MaxHealth}"
+                                           NumericInputMode="Decimal"
+                                           ParsingNumberStyle="Number" 
+                                           StringFormat="F1" />
 
                         <TextBlock Grid.Row="16" Grid.Column="0"
                                    Text="Melee Damage" />
                         <mah:NumericUpDown Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Margin="0,0,0,1" />
+                                           Margin="0,0,0,1"
+                                           IsEnabled="{Binding HasBarRewards}"
+                                           Value="{Binding MeleeDamage}"
+                                           NumericInputMode="Decimal"
+                                           ParsingNumberStyle="Number" 
+                                           StringFormat="F1" />
 
                         <TextBlock Grid.Row="17" Grid.Column="0"
                                    Text="Recoil Reduction" />
                         <mah:NumericUpDown Grid.Row="17" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Margin="0,0,0,1" />
+                                           Margin="0,0,0,1"
+                                           IsEnabled="{Binding HasBarRewards}"
+                                           Value="{Binding RecoilReduction}"
+                                           NumericInputMode="Decimal"
+                                           ParsingNumberStyle="Number" 
+                                           StringFormat="F1" />
 
                         <TextBlock Grid.Row="18" Grid.Column="0"
                                    Text="Reload Speed" />
                         <mah:NumericUpDown Grid.Row="18" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Margin="0,0,0,1" />
+                                           Margin="0,0,0,1"
+                                           IsEnabled="{Binding HasBarRewards}"
+                                           Value="{Binding ReloadSpeed}"
+                                           NumericInputMode="Decimal"
+                                           ParsingNumberStyle="Number" 
+                                           StringFormat="F1" />
 
                         <TextBlock Grid.Row="19" Grid.Column="0"
                                    Text="Shield Capacity" />
                         <mah:NumericUpDown Grid.Row="19" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Margin="0,0,0,1" />
+                                           Margin="0,0,0,1"
+                                           IsEnabled="{Binding HasBarRewards}"
+                                           Value="{Binding ShieldCapacity}"
+                                           NumericInputMode="Decimal"
+                                           ParsingNumberStyle="Number" 
+                                           StringFormat="F1" />
 
                         <TextBlock Grid.Row="20" Grid.Column="0"
                                    Text="Shield Recharge Delay" />
                         <mah:NumericUpDown Grid.Row="20" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Margin="0,0,0,1" />
+                                           Margin="0,0,0,1"
+                                           IsEnabled="{Binding HasBarRewards}"
+                                           Value="{Binding ShieldDelay}"
+                                           NumericInputMode="Decimal"
+                                           ParsingNumberStyle="Number" 
+                                           StringFormat="F1" />
 
                         <TextBlock Grid.Row="21" Grid.Column="0"
                                    Text="Shield Recharge Rate" />
                         <mah:NumericUpDown Grid.Row="21" Grid.Column="1" Grid.ColumnSpan="2"
-                                           Margin="0,0,0,1" />
+                                           Margin="0,0,0,1"
+                                           IsEnabled="{Binding HasBarRewards}"
+                                           Value="{Binding ShieldRate}"
+                                           NumericInputMode="Decimal"
+                                           ParsingNumberStyle="Number" 
+                                           StringFormat="F1" />
                     </Grid>
                 </ScrollViewer>
             </TabItem>

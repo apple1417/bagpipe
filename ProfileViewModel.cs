@@ -25,8 +25,6 @@ namespace bagpipe {
 
       Entries.CollectionChanged += (sender, e) => {
         UpdateWatchedEntries();
-
-        InvokePropertyChanged(nameof(HasCustomizations));
       };
 
       profile.ProfileLoaded += (sender, e) => {
@@ -109,6 +107,95 @@ namespace bagpipe {
     }
     #endregion
 
+    #region Watched Entry Updates
+    private Dictionary<KnownSettingInfo, PropertyChangedEventHandler> watchedEntryCallbacks = new Dictionary<KnownSettingInfo, PropertyChangedEventHandler>();
+
+    private void UpdateWatchedEntries() {
+      void UpdateWatchedEntry(KnownSettingInfo known, ref ProfileEntryViewModel entry, params string[] properties) {
+        ProfileEntryViewModel match = Entries.FirstOrDefault(x => known.Matches(x.ID, x.Type));
+        if (entry == match) {
+          return;
+        }
+
+        PropertyChangedEventHandler callback = watchedEntryCallbacks.GetValueOrDefault(known);
+        if (entry != null && callback != null) {
+          entry.PropertyChanged -= callback;
+        }
+
+        if (callback == null) {
+          callback = (sender, e) => {
+            if (e.PropertyName == nameof(ProfileEntryViewModel.Value)) {
+              foreach (string property in properties) {
+                InvokePropertyChanged(property);
+              }
+            }
+          };
+          watchedEntryCallbacks[known] = callback;
+        }
+
+        if (match != null) {
+          match.PropertyChanged += callback;
+        }
+        entry = match;
+        foreach (string property in properties) {
+          InvokePropertyChanged(property);
+        }
+      }
+
+      InvokePropertyChanged(nameof(HasCustomizations));
+
+      // We're firing events a bit more than we have to here, but ehh
+      UpdateWatchedEntry(KnownSettings.GoldenKeysEarned, ref _goldenKeysEarned, nameof(GoldenKeys));
+      UpdateWatchedEntry(KnownSettings.keyCount, ref _keyCount, nameof(GoldenKeys));
+      UpdateWatchedEntry(KnownSettings.keysSpent, ref _keysSpent, nameof(GoldenKeys));
+      InvokePropertyChanged(nameof(MaxGoldenKeys));
+
+      UpdateWatchedEntry(KnownSettings.StashSlot0, ref _slashSlot0, nameof(StashSlot0));
+      UpdateWatchedEntry(KnownSettings.StashSlot1, ref _slashSlot1, nameof(StashSlot1));
+      UpdateWatchedEntry(KnownSettings.StashSlot2, ref _slashSlot2, nameof(StashSlot2));
+      UpdateWatchedEntry(KnownSettings.StashSlot3, ref _slashSlot3, nameof(StashSlot3));
+
+      UpdateWatchedEntry(KnownSettings.BadassPoints, ref _badassPoints, nameof(BadassRank));
+      UpdateWatchedEntry(KnownSettings.BadassPointsSpent, ref _badassPointsSpent, nameof(BadassRank));
+      UpdateWatchedEntry(KnownSettings.BadassTokens, ref _badassTokens, nameof(BadassTokens));
+
+      // We only need to update the rewards object when the entry changes
+      ProfileEntryViewModel rewardsMatch = Entries.FirstOrDefault(x => KnownSettings.BadassRewardsEarned.Matches(x.ID, x.Type));
+      if (_badassRewardsEntry != rewardsMatch) {
+        badassRewards = new BARRewards(rewardsMatch);
+      }
+      UpdateWatchedEntry(
+        KnownSettings.BadassRewardsEarned,
+        ref _badassRewardsEntry,
+        nameof(CritDamage),
+        nameof(ElementalChance),
+        nameof(ElementalDamage),
+        nameof(FireRate),
+        nameof(GrenadeDamage),
+        nameof(GunAccuracy),
+        nameof(GunDamage),
+        nameof(MaxHealth),
+        nameof(MeleeDamage),
+        nameof(RecoilReduction),
+        nameof(ReloadSpeed),
+        nameof(ShieldCapacity),
+        nameof(ShieldDelay),
+        nameof(ShieldRate)
+      );
+      InvokePropertyChanged(nameof(HasBarRewards));
+    }
+
+    private void SetEntryProperty<T>(ProfileEntryViewModel entry, T value, [CallerMemberName] string property = null) {
+      if (property == null) {
+        throw new ArgumentNullException();
+      }
+      if (entry != null && value != null && !EqualityComparer<T>.Default.Equals((T)entry.Value, value)) {
+        entry.Value = value;
+        InvokePropertyChanged(property);
+      }
+    }
+    #endregion
+
     #region Customizations
     public bool HasCustomizations => Entries.Any(x => KnownSettings.UnlockedCustomizations.Matches(x.ID, x.Type));
 
@@ -123,66 +210,6 @@ namespace bagpipe {
       }
     }
     #endregion
-
-    #region Watched Entry Updates
-    private Dictionary<KnownSettingInfo, PropertyChangedEventHandler> watchedEntryCallbacks = new Dictionary<KnownSettingInfo, PropertyChangedEventHandler>();
-
-    private void UpdateWatchedEntries() {
-      void UpdateWatchedEntry(KnownSettingInfo data, string property, ref ProfileEntryViewModel entry) {
-        ProfileEntryViewModel match = Entries.FirstOrDefault(x => data.Matches(x.ID, x.Type));
-        if (entry == match) {
-          return;
-        }
-
-        PropertyChangedEventHandler callback = watchedEntryCallbacks.GetValueOrDefault(data);
-        if (entry != null && callback != null) {
-          entry.PropertyChanged -= callback;
-        }
-
-        if (callback == null) {
-          callback = (sender, e) => {
-            if (e.PropertyName == nameof(ProfileEntryViewModel.Value)) {
-              InvokePropertyChanged(property);
-            }
-          };
-          watchedEntryCallbacks[data] = callback;
-        }
-
-        if (match != null) {
-          match.PropertyChanged += callback;
-        }
-        entry = match;
-        InvokePropertyChanged(property);
-      }
-
-      // We're firing events a bit more than we have to here, but ehh
-      UpdateWatchedEntry(KnownSettings.GoldenKeysEarned, nameof(GoldenKeys), ref _goldenKeysEarned);
-      UpdateWatchedEntry(KnownSettings.keyCount, nameof(GoldenKeys), ref _keyCount);
-      UpdateWatchedEntry(KnownSettings.keysSpent, nameof(GoldenKeys), ref _keysSpent);
-      InvokePropertyChanged(nameof(MaxGoldenKeys));
-
-      UpdateWatchedEntry(KnownSettings.StashSlot0, nameof(StashSlot0), ref _slashSlot0);
-      UpdateWatchedEntry(KnownSettings.StashSlot1, nameof(StashSlot1), ref _slashSlot1);
-      UpdateWatchedEntry(KnownSettings.StashSlot2, nameof(StashSlot2), ref _slashSlot2);
-      UpdateWatchedEntry(KnownSettings.StashSlot3, nameof(StashSlot3), ref _slashSlot3);
-
-      UpdateWatchedEntry(KnownSettings.BadassPoints, nameof(BadassRank), ref _badassPoints);
-      UpdateWatchedEntry(KnownSettings.BadassPointsSpent, nameof(BadassRank), ref _badassPointsSpent);
-      UpdateWatchedEntry(KnownSettings.BadassTokens, nameof(BadassTokens), ref _badassTokens);
-    }
-
-    private void SetEntryProperty<T>(ProfileEntryViewModel entry, T value, [CallerMemberName]string property = null) {
-      if (property == null) {
-        throw new ArgumentNullException();
-      }
-      if (entry != null && value != null && !EqualityComparer<T>.Default.Equals((T)entry.Value, value)) {
-        entry.Value = value;
-        InvokePropertyChanged(property);
-      }
-    }
-    #endregion
-
-    #region Watched Entries
 
     #region Golden Keys
     private ProfileEntryViewModel _goldenKeysEarned;
@@ -203,6 +230,7 @@ namespace bagpipe {
 
         int sum = 0;
         for (int i = 0; i <= (keyBytes.Length - 3); i += 3) {
+          // TODO: is spent (i+2) clamped to > 0 like bl1e
           sum += keyBytes[i + 1] - keyBytes[i + 2];
         }
 
@@ -312,6 +340,81 @@ namespace bagpipe {
       set => SetEntryProperty(_badassTokens, value);
     }
 
+    #region BAR Rewards
+    private ProfileEntryViewModel _badassRewardsEntry;
+    private BARRewards badassRewards;
+
+    public bool HasBarRewards => _badassRewardsEntry != null;
+
+    public double? CritDamage {
+      get => badassRewards?[BARRewardStat.CritDamage];
+      set => badassRewards[BARRewardStat.CritDamage] = value;
+    }
+
+    public double? ElementalChance {
+      get => badassRewards?[BARRewardStat.ElementalChance];
+      set => badassRewards[BARRewardStat.ElementalChance] = value;
+    }
+
+    public double? ElementalDamage {
+      get => badassRewards?[BARRewardStat.ElementalDamage];
+      set => badassRewards[BARRewardStat.ElementalDamage] = value;
+    }
+
+    public double? FireRate {
+      get => badassRewards?[BARRewardStat.FireRate];
+      set => badassRewards[BARRewardStat.FireRate] = value;
+    }
+
+    public double? GrenadeDamage {
+      get => badassRewards?[BARRewardStat.GrenadeDamage];
+      set => badassRewards[BARRewardStat.GrenadeDamage] = value;
+    }
+
+    public double? GunAccuracy {
+      get => badassRewards?[BARRewardStat.GunAccuracy];
+      set => badassRewards[BARRewardStat.GunAccuracy] = value;
+    }
+
+    public double? GunDamage {
+      get => badassRewards?[BARRewardStat.GunDamage];
+      set => badassRewards[BARRewardStat.GunDamage] = value;
+    }
+
+    public double? MaxHealth {
+      get => badassRewards?[BARRewardStat.MaxHealth];
+      set => badassRewards[BARRewardStat.MaxHealth] = value;
+    }
+
+    public double? MeleeDamage {
+      get => badassRewards?[BARRewardStat.MeleeDamage];
+      set => badassRewards[BARRewardStat.MeleeDamage] = value;
+    }
+
+    public double? RecoilReduction {
+      get => badassRewards?[BARRewardStat.RecoilReduction];
+      set => badassRewards[BARRewardStat.RecoilReduction] = value;
+    }
+
+    public double? ReloadSpeed {
+      get => badassRewards?[BARRewardStat.ReloadSpeed];
+      set => badassRewards[BARRewardStat.ReloadSpeed] = value;
+    }
+
+    public double? ShieldCapacity {
+      get => badassRewards?[BARRewardStat.ShieldCapacity];
+      set => badassRewards[BARRewardStat.ShieldCapacity] = value;
+    }
+
+    public double? ShieldDelay {
+      get => badassRewards?[BARRewardStat.ShieldDelay];
+      set => badassRewards[BARRewardStat.ShieldDelay] = value;
+    }
+
+    public double? ShieldRate {
+      get => badassRewards?[BARRewardStat.ShieldRate];
+      set => badassRewards[BARRewardStat.ShieldRate] = value;
+    }
     #endregion
   }
 }

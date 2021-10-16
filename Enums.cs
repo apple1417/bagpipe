@@ -29,6 +29,23 @@
     BL1,
     BL1E,
     BL2,
-    TPS
+    TPS,
+  }
+
+  public enum BARRewardStat {
+    MaxHealth = 0,
+    ShieldCapacity = 1,
+    ShieldDelay = 2,
+    ShieldRate = 3,
+    MeleeDamage = 4,
+    GrenadeDamage = 5,
+    GunAccuracy = 6,
+    GunDamage = 7,
+    FireRate = 8,
+    RecoilReduction = 9,
+    ReloadSpeed = 10,
+    ElementalChance = 11,
+    ElementalDamage = 12,
+    CritDamage = 13,
   }
 }

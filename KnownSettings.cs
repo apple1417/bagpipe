@@ -31,6 +31,7 @@ namespace bagpipe {
     public static readonly KnownSettingInfo BadassPoints = new KnownSettingInfo(136, "BadassPoints", SettingsDataType.Int32);
     public static readonly KnownSettingInfo BadassPointsSpent = new KnownSettingInfo(137, "BadassPointsSpent", SettingsDataType.Int32);
     public static readonly KnownSettingInfo BadassTokens = new KnownSettingInfo(138, "BadassTokens", SettingsDataType.Int32);
+    public static readonly KnownSettingInfo BadassRewardsEarned = new KnownSettingInfo(143, "BadassRewardsEarned", SettingsDataType.String);
 
     public static readonly IReadOnlyDictionary<Game, IReadOnlyDictionary<int, KnownSettingInfo>> ByGame = new Dictionary<Game, IReadOnlyDictionary<int, KnownSettingInfo>>() {
       { Game.BL1, new Dictionary<int, KnownSettingInfo>() {
@@ -172,7 +173,7 @@ namespace bagpipe {
         { 140, new KnownSettingInfo(140, "AbsoluteMinimap", SettingsDataType.Int32) },
         { 141, new KnownSettingInfo(141, "HUDScaleX", SettingsDataType.Int32) },
         { 142, new KnownSettingInfo(142, "HUDScaleY", SettingsDataType.Int32) },
-        { 143, new KnownSettingInfo(143, "BadassRewardsEarned", SettingsDataType.String) },
+        { 143, BadassRewardsEarned },
         { 145, new KnownSettingInfo(145, "DriftCameraLock", SettingsDataType.Int32) },
         { 147, new KnownSettingInfo(147, "SplitDirection", SettingsDataType.Int32) },
         { 148, new KnownSettingInfo(148, "TradingDisabled", SettingsDataType.Int32) },
@@ -243,7 +244,7 @@ namespace bagpipe {
         { 140, new KnownSettingInfo(140, "AbsoluteMinimap", SettingsDataType.Int32) },
         { 141, new KnownSettingInfo(141, "HUDScaleX", SettingsDataType.Int32) },
         { 142, new KnownSettingInfo(142, "HUDScaleY", SettingsDataType.Int32) },
-        { 143, new KnownSettingInfo(143, "BadassRewardsEarned", SettingsDataType.String) },
+        { 143, BadassRewardsEarned },
         { 145, new KnownSettingInfo(145, "DriftCameraLock", SettingsDataType.Int32) },
         { 147, new KnownSettingInfo(147, "SplitDirection", SettingsDataType.Int32) },
         { 148, new KnownSettingInfo(148, "TradingDisabled", SettingsDataType.Int32) },
