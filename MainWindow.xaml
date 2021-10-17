@@ -24,6 +24,7 @@
         <local:HexByteArrayConverter x:Key="HexByteArrayConverter" />
         <local:SerialByteArrayConverter x:Key="SerialByteArrayConverter" />
         <local:SettingsTypeTemplateSelector x:Key="SettingsTypeTemplateSelector" />
+        <local:NegativeDoubleConverter x:Key="NegativeDoubleConverter" />
 
         <local:BooleanToZeroWidthConverter x:Key="TypeWidthConverter" Width="{x:Static sys:Double.NaN}"/>
         <local:BooleanToZeroWidthConverter x:Key="OwnerWidthConverter" Width="{x:Static sys:Double.NaN}"/>
@@ -371,94 +372,122 @@
                             </mah:NumericUpDown.Style>
                         </mah:NumericUpDown>
 
-                        <!-- TODO: rearrange to same order as game -->
                         <TextBlock Grid.Row="8" Grid.Column="0"
-                                   Text="Critical Hit Damage" />
+                                   Text="Maximum Health" />
                         <mah:NumericUpDown Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="2"
                                            Margin="0,0,0,1"
                                            IsEnabled="{Binding HasBarRewards}"
-                                           Value="{Binding CritDamage}"
+                                           Minimum="0"
+                                           Maximum="{x:Static local:BARRewards.MAX_REWARD}"
+                                           Value="{Binding MaxHealth}"
+                                           Interval="{Binding MaxHealthInterval}"
                                            NumericInputMode="Decimal"
                                            ParsingNumberStyle="Number" 
-                                           StringFormat="F1"/>
-
-
+                                           StringFormat="F1" />
+                        
                         <TextBlock Grid.Row="9" Grid.Column="0"
-                                   Text="Elemental Effect Chance" />
+                                   Text="Shield Capacity" />
                         <mah:NumericUpDown Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="2"
                                            Margin="0,0,0,1"
                                            IsEnabled="{Binding HasBarRewards}"
-                                           Value="{Binding ElementalChance}"
+                                           Minimum="0"
+                                           Maximum="{x:Static local:BARRewards.MAX_REWARD}"
+                                           Value="{Binding ShieldCapacity}"
+                                           Interval="{Binding ShieldCapacityInterval}"
                                            NumericInputMode="Decimal"
                                            ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="10" Grid.Column="0"
-                                   Text="Elemental Effect Damage" />
+                                   Text="Shield Recharge Delay" />
                         <mah:NumericUpDown Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="2"
                                            Margin="0,0,0,1"
                                            IsEnabled="{Binding HasBarRewards}"
-                                           Value="{Binding ElementalDamage}"
+                                           Minimum="{Binding Source={x:Static local:BARRewards.MAX_REWARD},
+                                                             Mode=OneTime,
+                                                             Converter={StaticResource NegativeDoubleConverter}}"
+                                           Maximum="0"
+                                           Value="{Binding ShieldDelay,
+                                                           Converter={StaticResource NegativeDoubleConverter}}"
+                                           Interval="{Binding ShieldDelayInterval}"
                                            NumericInputMode="Decimal"
                                            ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="11" Grid.Column="0"
-                                   Text="Fire Rate" />
+                                   Text="Shield Recharge Rate" />
                         <mah:NumericUpDown Grid.Row="11" Grid.Column="1" Grid.ColumnSpan="2"
                                            Margin="0,0,0,1"
                                            IsEnabled="{Binding HasBarRewards}"
-                                           Value="{Binding FireRate}"
+                                           Minimum="0"
+                                           Maximum="{x:Static local:BARRewards.MAX_REWARD}"
+                                           Value="{Binding ShieldRate}"
+                                           Interval="{Binding ShieldRateInterval}"
                                            NumericInputMode="Decimal"
                                            ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="12" Grid.Column="0"
-                                   Text="Gun Accuracy" />
+                                   Text="Melee Damage" />
                         <mah:NumericUpDown Grid.Row="12" Grid.Column="1" Grid.ColumnSpan="2"
                                            Margin="0,0,0,1"
                                            IsEnabled="{Binding HasBarRewards}"
-                                           Value="{Binding GunAccuracy}"
+                                           Minimum="0"
+                                           Maximum="{x:Static local:BARRewards.MAX_REWARD}"
+                                           Value="{Binding MeleeDamage}"
+                                           Interval="{Binding MeleeDamageInterval}"
                                            NumericInputMode="Decimal"
                                            ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="13" Grid.Column="0"
-                                   Text="Gun Damage" />
+                                   Text="Grenade Damage" />
                         <mah:NumericUpDown Grid.Row="13" Grid.Column="1" Grid.ColumnSpan="2"
                                            Margin="0,0,0,1"
                                            IsEnabled="{Binding HasBarRewards}"
-                                           Value="{Binding GunDamage}"
+                                           Minimum="0"
+                                           Maximum="{x:Static local:BARRewards.MAX_REWARD}"
+                                           Value="{Binding GrenadeDamage}"
+                                           Interval="{Binding GrenadeDamageInterval}"
                                            NumericInputMode="Decimal"
                                            ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
-
+                        
                         <TextBlock Grid.Row="14" Grid.Column="0"
-                                   Text="Grenade Damage" />
+                                   Text="Gun Accuracy" />
                         <mah:NumericUpDown Grid.Row="14" Grid.Column="1" Grid.ColumnSpan="2"
                                            Margin="0,0,0,1"
                                            IsEnabled="{Binding HasBarRewards}"
-                                           Value="{Binding GrenadeDamage}"
+                                           Minimum="0"
+                                           Maximum="{x:Static local:BARRewards.MAX_REWARD}"
+                                           Value="{Binding GunAccuracy}"
+                                           Interval="{Binding GunAccuracyInterval}"
                                            NumericInputMode="Decimal"
                                            ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="15" Grid.Column="0"
-                                   Text="Maximum Health" />
+                                   Text="Gun Damage" />
                         <mah:NumericUpDown Grid.Row="15" Grid.Column="1" Grid.ColumnSpan="2"
                                            Margin="0,0,0,1"
                                            IsEnabled="{Binding HasBarRewards}"
-                                           Value="{Binding MaxHealth}"
+                                           Minimum="0"
+                                           Maximum="{x:Static local:BARRewards.MAX_REWARD}"
+                                           Value="{Binding GunDamage}"
+                                           Interval="{Binding GunDamageInterval}"
                                            NumericInputMode="Decimal"
                                            ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="16" Grid.Column="0"
-                                   Text="Melee Damage" />
+                                   Text="Fire Rate" />
                         <mah:NumericUpDown Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="2"
                                            Margin="0,0,0,1"
                                            IsEnabled="{Binding HasBarRewards}"
-                                           Value="{Binding MeleeDamage}"
+                                           Minimum="0"
+                                           Maximum="{x:Static local:BARRewards.MAX_REWARD}"
+                                           Value="{Binding FireRate}"
+                                           Interval="{Binding FireRateInterval}"
                                            NumericInputMode="Decimal"
                                            ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
@@ -468,7 +497,10 @@
                         <mah:NumericUpDown Grid.Row="17" Grid.Column="1" Grid.ColumnSpan="2"
                                            Margin="0,0,0,1"
                                            IsEnabled="{Binding HasBarRewards}"
+                                           Minimum="0"
+                                           Maximum="{x:Static local:BARRewards.MAX_REWARD}"
                                            Value="{Binding RecoilReduction}"
+                                           Interval="{Binding RecoilReductionInterval}"
                                            NumericInputMode="Decimal"
                                            ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
@@ -478,40 +510,52 @@
                         <mah:NumericUpDown Grid.Row="18" Grid.Column="1" Grid.ColumnSpan="2"
                                            Margin="0,0,0,1"
                                            IsEnabled="{Binding HasBarRewards}"
+                                           Minimum="0"
+                                           Maximum="{x:Static local:BARRewards.MAX_REWARD}"
                                            Value="{Binding ReloadSpeed}"
+                                           Interval="{Binding ReloadSpeedInterval}"
                                            NumericInputMode="Decimal"
                                            ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="19" Grid.Column="0"
-                                   Text="Shield Capacity" />
+                                   Text="Elemental Effect Chance" />
                         <mah:NumericUpDown Grid.Row="19" Grid.Column="1" Grid.ColumnSpan="2"
                                            Margin="0,0,0,1"
                                            IsEnabled="{Binding HasBarRewards}"
-                                           Value="{Binding ShieldCapacity}"
+                                           Minimum="0"
+                                           Maximum="{x:Static local:BARRewards.MAX_REWARD}"
+                                           Value="{Binding ElementalChance}"
+                                           Interval="{Binding ElementalChanceInterval}"
                                            NumericInputMode="Decimal"
                                            ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="20" Grid.Column="0"
-                                   Text="Shield Recharge Delay" />
+                                   Text="Elemental Effect Damage" />
                         <mah:NumericUpDown Grid.Row="20" Grid.Column="1" Grid.ColumnSpan="2"
                                            Margin="0,0,0,1"
                                            IsEnabled="{Binding HasBarRewards}"
-                                           Value="{Binding ShieldDelay}"
+                                           Minimum="0"
+                                           Maximum="{x:Static local:BARRewards.MAX_REWARD}"
+                                           Value="{Binding ElementalDamage}"
+                                           Interval="{Binding ElementalDamageInterval}"
                                            NumericInputMode="Decimal"
                                            ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
-
+                        
                         <TextBlock Grid.Row="21" Grid.Column="0"
-                                   Text="Shield Recharge Rate" />
+                                   Text="Critical Hit Damage" />
                         <mah:NumericUpDown Grid.Row="21" Grid.Column="1" Grid.ColumnSpan="2"
                                            Margin="0,0,0,1"
                                            IsEnabled="{Binding HasBarRewards}"
-                                           Value="{Binding ShieldRate}"
+                                           Minimum="0"
+                                           Maximum="{x:Static local:BARRewards.MAX_REWARD}"
+                                           Value="{Binding CritDamage}"
+                                           Interval="{Binding CritDamageInterval}"
                                            NumericInputMode="Decimal"
                                            ParsingNumberStyle="Number" 
-                                           StringFormat="F1" />
+                                           StringFormat="F1"/>
                     </Grid>
                 </ScrollViewer>
             </TabItem>

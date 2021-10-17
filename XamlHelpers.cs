@@ -182,4 +182,14 @@ namespace bagpipe {
       return new object[] { isValid ? converted : DependencyProperty.UnsetValue, Binding.DoNothing };
     }
   }
+
+  class NegativeDoubleConverter : DependencyObject, IValueConverter {
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
+      return value == null ? null : (double?)value * -1;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
+      return value == null ? null : (double?)value * -1;
+    }
+  }
 }

@@ -111,7 +111,7 @@ namespace bagpipe {
     private Dictionary<KnownSettingInfo, PropertyChangedEventHandler> watchedEntryCallbacks = new Dictionary<KnownSettingInfo, PropertyChangedEventHandler>();
 
     private void UpdateWatchedEntries() {
-      void UpdateWatchedEntry(KnownSettingInfo known, ref ProfileEntryViewModel entry, params string[] properties) {
+      void UpdateWatchedEntry(KnownSettingInfo known, ref ProfileEntryViewModel entry, string property) {
         ProfileEntryViewModel match = Entries.FirstOrDefault(x => known.Matches(x.ID, x.Type));
         if (entry == match) {
           return;
@@ -125,9 +125,7 @@ namespace bagpipe {
         if (callback == null) {
           callback = (sender, e) => {
             if (e.PropertyName == nameof(ProfileEntryViewModel.Value)) {
-              foreach (string property in properties) {
-                InvokePropertyChanged(property);
-              }
+              InvokePropertyChanged(property);
             }
           };
           watchedEntryCallbacks[known] = callback;
@@ -137,9 +135,7 @@ namespace bagpipe {
           match.PropertyChanged += callback;
         }
         entry = match;
-        foreach (string property in properties) {
-          InvokePropertyChanged(property);
-        }
+        InvokePropertyChanged(property);
       }
 
       InvokePropertyChanged(nameof(HasCustomizations));
@@ -159,29 +155,37 @@ namespace bagpipe {
       UpdateWatchedEntry(KnownSettings.BadassPointsSpent, ref _badassPointsSpent, nameof(BadassRank));
       UpdateWatchedEntry(KnownSettings.BadassTokens, ref _badassTokens, nameof(BadassTokens));
 
-      // We only need to update the rewards object when the entry changes
+      // This is similar, but different enough we can't really use the function
       ProfileEntryViewModel rewardsMatch = Entries.FirstOrDefault(x => KnownSettings.BadassRewardsEarned.Matches(x.ID, x.Type));
       if (_badassRewardsEntry != rewardsMatch) {
         badassRewards = new BARRewards(rewardsMatch);
+
+        PropertyChangedEventHandler callback = watchedEntryCallbacks.GetValueOrDefault(KnownSettings.BadassRewardsEarned);
+        if (_badassRewardsEntry != null && callback != null) {
+          _badassRewardsEntry.PropertyChanged -= callback;
+        }
+
+        if (callback == null) {
+          callback = (sender, e) => {
+            // We don't need all our values to throw changed events when we're only updating one
+            if (e.PropertyName == nameof(ProfileEntryViewModel.Value) && !badassRewards.InUpdate) {
+              foreach (string property in BADASS_REWARD_PROPERTIES) {
+                InvokePropertyChanged(property);
+              }
+            }
+          };
+          watchedEntryCallbacks[KnownSettings.BadassRewardsEarned] = callback;
+        }
+
+        if (rewardsMatch != null) {
+          rewardsMatch.PropertyChanged += callback;
+        }
+        _badassRewardsEntry = rewardsMatch;
+        foreach (string property in BADASS_REWARD_PROPERTIES) {
+          InvokePropertyChanged(property);
+        }
       }
-      UpdateWatchedEntry(
-        KnownSettings.BadassRewardsEarned,
-        ref _badassRewardsEntry,
-        nameof(CritDamage),
-        nameof(ElementalChance),
-        nameof(ElementalDamage),
-        nameof(FireRate),
-        nameof(GrenadeDamage),
-        nameof(GunAccuracy),
-        nameof(GunDamage),
-        nameof(MaxHealth),
-        nameof(MeleeDamage),
-        nameof(RecoilReduction),
-        nameof(ReloadSpeed),
-        nameof(ShieldCapacity),
-        nameof(ShieldDelay),
-        nameof(ShieldRate)
-      );
+
       InvokePropertyChanged(nameof(HasBarRewards));
     }
 
@@ -219,7 +223,6 @@ namespace bagpipe {
     private int? _bl1eKeys => _keyCount == null
                             ? null
                             : (int?)_keyCount.Value - Math.Max(0, (int)(_keysSpent?.Value ?? 0));
-    // TODO: does this need caching?
     private int? _bl2Keys {
       get {
         if (_goldenKeysEarned == null) {
@@ -230,7 +233,6 @@ namespace bagpipe {
 
         int sum = 0;
         for (int i = 0; i <= (keyBytes.Length - 3); i += 3) {
-          // TODO: is spent (i+2) clamped to > 0 like bl1e
           sum += keyBytes[i + 1] - keyBytes[i + 2];
         }
 
@@ -346,75 +348,204 @@ namespace bagpipe {
 
     public bool HasBarRewards => _badassRewardsEntry != null;
 
+    private readonly string[] BADASS_REWARD_PROPERTIES = new string[] {
+      nameof(CritDamage),
+      nameof(CritDamageInterval),
+      nameof(ElementalChance),
+      nameof(ElementalChanceInterval),
+      nameof(ElementalDamage),
+      nameof(ElementalDamageInterval),
+      nameof(FireRate),
+      nameof(FireRateInterval),
+      nameof(GrenadeDamage),
+      nameof(GrenadeDamageInterval),
+      nameof(GunAccuracy),
+      nameof(GunAccuracyInterval),
+      nameof(GunDamage),
+      nameof(GunDamageInterval),
+      nameof(MaxHealth),
+      nameof(MaxHealthInterval),
+      nameof(MeleeDamage),
+      nameof(MeleeDamageInterval),
+      nameof(RecoilReduction),
+      nameof(RecoilReductionInterval),
+      nameof(ReloadSpeed),
+      nameof(ReloadSpeedInterval),
+      nameof(ShieldCapacity),
+      nameof(ShieldCapacityInterval),
+      nameof(ShieldDelay),
+      nameof(ShieldDelayInterval),
+      nameof(ShieldRate),
+      nameof(ShieldRateInterval)
+    };
+
     public double? CritDamage {
       get => badassRewards?[BARRewardStat.CritDamage];
-      set => badassRewards[BARRewardStat.CritDamage] = value;
+      set {
+        if (value != badassRewards[BARRewardStat.CritDamage]) {
+          badassRewards[BARRewardStat.CritDamage] = value;
+          InvokePropertyChanged(nameof(CritDamage));
+          InvokePropertyChanged(nameof(CritDamageInterval));
+        }
+      }
     }
+    public double CritDamageInterval => badassRewards?.GetInterval(BARRewardStat.CritDamage) ?? 1;
 
     public double? ElementalChance {
       get => badassRewards?[BARRewardStat.ElementalChance];
-      set => badassRewards[BARRewardStat.ElementalChance] = value;
+      set {
+        if (value != badassRewards[BARRewardStat.ElementalChance]) {
+          badassRewards[BARRewardStat.ElementalChance] = value;
+          InvokePropertyChanged(nameof(ElementalChance));
+          InvokePropertyChanged(nameof(ElementalChanceInterval));
+        }
+      }
     }
+    public double ElementalChanceInterval => badassRewards?.GetInterval(BARRewardStat.ElementalChance) ?? 1;
 
     public double? ElementalDamage {
       get => badassRewards?[BARRewardStat.ElementalDamage];
-      set => badassRewards[BARRewardStat.ElementalDamage] = value;
+      set {
+        if (value != badassRewards[BARRewardStat.ElementalDamage]) {
+          badassRewards[BARRewardStat.ElementalDamage] = value;
+          InvokePropertyChanged(nameof(ElementalDamage));
+          InvokePropertyChanged(nameof(ElementalDamageInterval));
+        }
+      }
     }
+    public double ElementalDamageInterval => badassRewards?.GetInterval(BARRewardStat.ElementalDamage) ?? 1;
 
     public double? FireRate {
       get => badassRewards?[BARRewardStat.FireRate];
-      set => badassRewards[BARRewardStat.FireRate] = value;
+      set {
+        if (value != badassRewards[BARRewardStat.FireRate]) {
+          badassRewards[BARRewardStat.FireRate] = value;
+          InvokePropertyChanged(nameof(FireRate));
+          InvokePropertyChanged(nameof(FireRateInterval));
+        }
+      }
     }
+    public double FireRateInterval => badassRewards?.GetInterval(BARRewardStat.FireRate) ?? 1;
 
     public double? GrenadeDamage {
       get => badassRewards?[BARRewardStat.GrenadeDamage];
-      set => badassRewards[BARRewardStat.GrenadeDamage] = value;
+      set {
+        if (value != badassRewards[BARRewardStat.GrenadeDamage]) {
+          badassRewards[BARRewardStat.GrenadeDamage] = value;
+          InvokePropertyChanged(nameof(GrenadeDamage));
+          InvokePropertyChanged(nameof(GrenadeDamageInterval));
+        }
+      }
     }
+    public double GrenadeDamageInterval => badassRewards?.GetInterval(BARRewardStat.GrenadeDamage) ?? 1;
 
     public double? GunAccuracy {
       get => badassRewards?[BARRewardStat.GunAccuracy];
-      set => badassRewards[BARRewardStat.GunAccuracy] = value;
+      set {
+        if (value != badassRewards[BARRewardStat.GunAccuracy]) {
+          badassRewards[BARRewardStat.GunAccuracy] = value;
+          InvokePropertyChanged(nameof(GunAccuracy));
+          InvokePropertyChanged(nameof(GunAccuracyInterval));
+        }
+      }
     }
+    public double GunAccuracyInterval => badassRewards?.GetInterval(BARRewardStat.GunAccuracy) ?? 1;
 
     public double? GunDamage {
       get => badassRewards?[BARRewardStat.GunDamage];
-      set => badassRewards[BARRewardStat.GunDamage] = value;
+      set {
+        if (value != badassRewards[BARRewardStat.GunDamage]) {
+          badassRewards[BARRewardStat.GunDamage] = value;
+          InvokePropertyChanged(nameof(GunDamage));
+          InvokePropertyChanged(nameof(GunDamageInterval));
+        }
+      }
     }
+    public double GunDamageInterval => badassRewards?.GetInterval(BARRewardStat.GunDamage) ?? 1;
 
     public double? MaxHealth {
       get => badassRewards?[BARRewardStat.MaxHealth];
-      set => badassRewards[BARRewardStat.MaxHealth] = value;
+      set {
+        if (value != badassRewards[BARRewardStat.MaxHealth]) {
+          badassRewards[BARRewardStat.MaxHealth] = value;
+          InvokePropertyChanged(nameof(MaxHealth));
+          InvokePropertyChanged(nameof(MaxHealthInterval));
+        }
+      }
     }
+    public double MaxHealthInterval => badassRewards?.GetInterval(BARRewardStat.MaxHealth) ?? 1;
 
     public double? MeleeDamage {
       get => badassRewards?[BARRewardStat.MeleeDamage];
-      set => badassRewards[BARRewardStat.MeleeDamage] = value;
+      set {
+        if (value != badassRewards[BARRewardStat.MeleeDamage]) {
+          badassRewards[BARRewardStat.MeleeDamage] = value;
+          InvokePropertyChanged(nameof(MeleeDamage));
+          InvokePropertyChanged(nameof(MeleeDamageInterval));
+        }
+      }
     }
+    public double MeleeDamageInterval => badassRewards?.GetInterval(BARRewardStat.MeleeDamage) ?? 1;
 
     public double? RecoilReduction {
       get => badassRewards?[BARRewardStat.RecoilReduction];
-      set => badassRewards[BARRewardStat.RecoilReduction] = value;
+      set {
+        if (value != badassRewards[BARRewardStat.RecoilReduction]) {
+          badassRewards[BARRewardStat.RecoilReduction] = value;
+          InvokePropertyChanged(nameof(RecoilReduction));
+          InvokePropertyChanged(nameof(RecoilReductionInterval));
+        }
+      }
     }
+    public double RecoilReductionInterval => badassRewards?.GetInterval(BARRewardStat.RecoilReduction) ?? 1;
 
     public double? ReloadSpeed {
       get => badassRewards?[BARRewardStat.ReloadSpeed];
-      set => badassRewards[BARRewardStat.ReloadSpeed] = value;
+      set {
+        if (value != badassRewards[BARRewardStat.ReloadSpeed]) {
+          badassRewards[BARRewardStat.ReloadSpeed] = value;
+          InvokePropertyChanged(nameof(ReloadSpeed));
+          InvokePropertyChanged(nameof(ReloadSpeedInterval));
+        }
+      }
     }
+    public double ReloadSpeedInterval => badassRewards?.GetInterval(BARRewardStat.ReloadSpeed) ?? 1;
 
     public double? ShieldCapacity {
       get => badassRewards?[BARRewardStat.ShieldCapacity];
-      set => badassRewards[BARRewardStat.ShieldCapacity] = value;
+      set {
+        if (value != badassRewards[BARRewardStat.ShieldCapacity]) {
+          badassRewards[BARRewardStat.ShieldCapacity] = value;
+          InvokePropertyChanged(nameof(ShieldCapacity));
+          InvokePropertyChanged(nameof(ShieldCapacityInterval));
+        }
+      }
     }
+    public double ShieldCapacityInterval => badassRewards?.GetInterval(BARRewardStat.ShieldCapacity) ?? 1;
 
     public double? ShieldDelay {
       get => badassRewards?[BARRewardStat.ShieldDelay];
-      set => badassRewards[BARRewardStat.ShieldDelay] = value;
+      set {
+        if (value != badassRewards[BARRewardStat.ShieldDelay]) {
+          badassRewards[BARRewardStat.ShieldDelay] = value;
+          InvokePropertyChanged(nameof(ShieldDelay));
+          InvokePropertyChanged(nameof(ShieldDelayInterval));
+        }
+      }
     }
+    public double ShieldDelayInterval => badassRewards?.GetInterval(BARRewardStat.ShieldDelay) ?? 1;
 
     public double? ShieldRate {
       get => badassRewards?[BARRewardStat.ShieldRate];
-      set => badassRewards[BARRewardStat.ShieldRate] = value;
+      set {
+        if (value != badassRewards[BARRewardStat.ShieldRate]) {
+          badassRewards[BARRewardStat.ShieldRate] = value;
+          InvokePropertyChanged(nameof(ShieldRate));
+          InvokePropertyChanged(nameof(ShieldRateInterval));
+        }
+      }
     }
+    public double ShieldRateInterval => badassRewards?.GetInterval(BARRewardStat.ShieldRate) ?? 1;
     #endregion
   }
 }
