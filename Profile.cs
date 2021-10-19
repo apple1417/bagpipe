@@ -143,10 +143,7 @@ namespace bagpipe {
       return unknownData;
     }
 
-    public void Save(string path) {
-      byte[] compressedData;
-      int decompressedSize;
-
+    private byte[] GetDecompressedData() {
       using (MemoryStream ms = new MemoryStream()) {
         void WriteInt32(int val) {
           byte[] buf = new byte[4];
@@ -213,30 +210,37 @@ namespace bagpipe {
           ms.WriteByte((byte)entry.AdvertisementType);
         }
 
-        // TODO: warn when above 9000 bytes
-        decompressedSize = (int)ms.Length;
-        try {
-          compressedData = LZO.Compress(ms.GetBuffer(), 0, decompressedSize);
-        } catch (Win32Exception ex) {
-          throw new IOException(ex.Message, ex);
-        }
+        return ms.GetBuffer();
+      }
+    }
+
+    public bool IsOverSizeLimit() => GetDecompressedData().Length > 9000;
+
+    public void Save(string path) {
+      byte[] decompressed = GetDecompressedData();
+      byte[] compressed;
+
+      try {
+        compressed = LZO.Compress(decompressed, 0, decompressed.Length);
+      } catch (Win32Exception ex) {
+        throw new IOException(ex.Message, ex);
       }
 
       using (SHA1Managed sha1 = new SHA1Managed()) {
-        byte[] decompressedSizeBuf = new byte[4];
-        BinaryPrimitives.WriteInt32BigEndian(decompressedSizeBuf, decompressedSize);
+        byte[] decompressedSize = new byte[4];
+        BinaryPrimitives.WriteInt32BigEndian(decompressedSize, decompressed.Length);
 
-        sha1.TransformBlock(decompressedSizeBuf, 0, decompressedSizeBuf.Length, null, 0);
-        sha1.TransformFinalBlock(compressedData, 0, compressedData.Length);
+        sha1.TransformBlock(decompressedSize, 0, decompressedSize.Length, null, 0);
+        sha1.TransformFinalBlock(compressed, 0, compressed.Length);
 
         using (FileStream fs = new FileStream(path, FileMode.Create)) {
           fs.Write(sha1.Hash);
-          fs.Write(decompressedSizeBuf);
-          fs.Write(compressedData);
+          fs.Write(decompressedSize);
+          fs.Write(compressed);
         }
-      }
 
-      ProfileSaved?.Invoke(this, new ProfileUpdateEventArgs(path));
+        ProfileSaved?.Invoke(this, new ProfileUpdateEventArgs(path));
+      }
     }
   }
 }

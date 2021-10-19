@@ -43,7 +43,7 @@ namespace bagpipe {
     };
 
     private void OpenButton_Click(object sender, RoutedEventArgs e) {
-      // TODO: possibly crashing when something has a lock on file?
+      openDialog.FileName = "";
       bool? ok = openDialog.ShowDialog();
       if (ok.HasValue && ok.Value) {
         // TODO: processing dialog
@@ -57,10 +57,27 @@ namespace bagpipe {
       }
     }
 
-    private void SaveButton_Click(object sender, RoutedEventArgs e) {
+    private async void SaveButton_Click(object sender, RoutedEventArgs e) {
+      saveDialog.FileName = "";
       bool? ok = saveDialog.ShowDialog();
       if (ok.HasValue && ok.Value) {
         // TODO: processing dialog
+
+        if (profile.IsOverSizeLimit()) {
+          MessageDialogResult res = await this.ShowMessageAsync(
+            "Warning",
+            "This profile contains over 9000 bytes of raw data, which may make the game read it as corrupt. Do you want to continue?",
+            MessageDialogStyle.AffirmativeAndNegative,
+            new MetroDialogSettings() {
+              AffirmativeButtonText = "Yes",
+              NegativeButtonText = "No"
+            }
+          );
+          if (res != MessageDialogResult.Affirmative) {
+            return;
+          }
+        }
+
         profile.Save(saveDialog.FileName);
       }
     }

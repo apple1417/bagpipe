@@ -203,7 +203,6 @@ namespace bagpipe {
     #region Customizations
     public bool HasCustomizations => Entries.Any(x => KnownSettings.UnlockedCustomizations.Matches(x.ID, x.Type));
 
-    // TODO: Validate
     private static readonly byte[] NO_CUSTOMIZATIONS = Enumerable.Repeat((byte)0, 1001).ToArray();
     private static readonly byte[] ALL_CUSTOMIZATIONS = Enumerable.Repeat((byte)0xFF, 1001).ToArray();
 

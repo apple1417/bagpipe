@@ -47,8 +47,7 @@
                                Value="{Binding Value,
                                                Converter={StaticResource DoubleCastingConverter},
                                                ConverterParameter={x:Type sys:Int32}}"
-                               NumericInputMode="Numbers"
-                               ParsingNumberStyle="Integer,AllowThousands" />
+                               NumericInputMode="Numbers" />
         </DataTemplate>
         <DataTemplate x:Key="Int64SettingsTemplate">
             <mah:NumericUpDown Minimum="{Binding Source={x:Static sys:Int64.MinValue},
@@ -62,14 +61,11 @@
                                Value="{Binding Value,
                                                Converter={StaticResource DoubleCastingConverter},
                                                ConverterParameter={x:Type sys:Int64}}"
-                               NumericInputMode="Numbers"
-                               ParsingNumberStyle="Integer,AllowThousands" />
+                               NumericInputMode="Numbers" />
         </DataTemplate>
         <DataTemplate x:Key="DoubleSettingsTemplate">
-            <!-- TODO: can't actually input decimals? -->
             <mah:NumericUpDown Value="{Binding Value}"
-                               NumericInputMode="Decimal"
-                               ParsingNumberStyle="Number" />
+                               NumericInputMode="Decimal" />
         </DataTemplate>
         <DataTemplate x:Key="StringSettingsTemplate">
             <TextBox Text="{Binding Value}"
@@ -89,8 +85,7 @@
                                Value="{Binding Value,
                                                Converter={StaticResource DoubleCastingConverter},
                                                ConverterParameter={x:Type sys:Single}}"
-                               NumericInputMode="Decimal"
-                               ParsingNumberStyle="Number" />
+                               NumericInputMode="Decimal" />
         </DataTemplate>
         <DataTemplate x:Key="BlobSettingsTemplate">
             <TextBox TextWrapping="Wrap"
@@ -121,8 +116,7 @@
                                Value="{Binding Value,
                                                Converter={StaticResource DoubleCastingConverter},
                                                ConverterParameter={x:Type sys:Byte}}"
-                               NumericInputMode="Numbers"
-                               ParsingNumberStyle="Integer,AllowThousands" />
+                               NumericInputMode="Numbers" />
         </DataTemplate>
 
         <Style TargetType="{x:Type Button}" BasedOn="{mah:StaticResource MahApps.Styles.Button}">
@@ -216,8 +210,7 @@
                                            Value="{Binding GoldenKeys,
                                                            Converter={StaticResource DoubleCastingConverter},
                                                            ConverterParameter={x:Type sys:Int32}}"
-                                           NumericInputMode="Numbers"
-                                           ParsingNumberStyle="Integer,AllowThousands">
+                                           NumericInputMode="Numbers">
                             <mah:NumericUpDown.Style>
                                 <Style TargetType="{x:Type mah:NumericUpDown}">
                                     <Style.Triggers>
@@ -326,8 +319,7 @@
                                            Value="{Binding BadassRank,
                                                            Converter={StaticResource DoubleCastingConverter},
                                                            ConverterParameter={x:Type sys:Int32}}"
-                                           NumericInputMode="Numbers"
-                                           ParsingNumberStyle="Integer,AllowThousands">
+                                           NumericInputMode="Numbers">
                             <mah:NumericUpDown.Style>
                                 <Style TargetType="{x:Type mah:NumericUpDown}">
                                     <Style.Triggers>
@@ -355,8 +347,7 @@
                                            Value="{Binding BadassTokens,
                                                            Converter={StaticResource DoubleCastingConverter},
                                                            ConverterParameter={x:Type sys:Int32}}"
-                                           NumericInputMode="Numbers"
-                                           ParsingNumberStyle="Integer,AllowThousands">
+                                           NumericInputMode="Numbers">
                             <mah:NumericUpDown.Style>
                                 <Style TargetType="{x:Type mah:NumericUpDown}">
                                     <Style.Triggers>
@@ -381,8 +372,7 @@
                                            Maximum="{x:Static local:BARRewards.MAX_REWARD}"
                                            Value="{Binding MaxHealth}"
                                            Interval="{Binding MaxHealthInterval}"
-                                           NumericInputMode="Decimal"
-                                           ParsingNumberStyle="Number" 
+                                           NumericInputMode="Decimal" 
                                            StringFormat="F1" />
                         
                         <TextBlock Grid.Row="9" Grid.Column="0"
@@ -395,7 +385,6 @@
                                            Value="{Binding ShieldCapacity}"
                                            Interval="{Binding ShieldCapacityInterval}"
                                            NumericInputMode="Decimal"
-                                           ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="10" Grid.Column="0"
@@ -411,7 +400,6 @@
                                                            Converter={StaticResource NegativeDoubleConverter}}"
                                            Interval="{Binding ShieldDelayInterval}"
                                            NumericInputMode="Decimal"
-                                           ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="11" Grid.Column="0"
@@ -424,7 +412,6 @@
                                            Value="{Binding ShieldRate}"
                                            Interval="{Binding ShieldRateInterval}"
                                            NumericInputMode="Decimal"
-                                           ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="12" Grid.Column="0"
@@ -437,7 +424,6 @@
                                            Value="{Binding MeleeDamage}"
                                            Interval="{Binding MeleeDamageInterval}"
                                            NumericInputMode="Decimal"
-                                           ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="13" Grid.Column="0"
@@ -450,7 +436,6 @@
                                            Value="{Binding GrenadeDamage}"
                                            Interval="{Binding GrenadeDamageInterval}"
                                            NumericInputMode="Decimal"
-                                           ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
                         
                         <TextBlock Grid.Row="14" Grid.Column="0"
@@ -463,7 +448,6 @@
                                            Value="{Binding GunAccuracy}"
                                            Interval="{Binding GunAccuracyInterval}"
                                            NumericInputMode="Decimal"
-                                           ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="15" Grid.Column="0"
@@ -476,7 +460,6 @@
                                            Value="{Binding GunDamage}"
                                            Interval="{Binding GunDamageInterval}"
                                            NumericInputMode="Decimal"
-                                           ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="16" Grid.Column="0"
@@ -489,7 +472,6 @@
                                            Value="{Binding FireRate}"
                                            Interval="{Binding FireRateInterval}"
                                            NumericInputMode="Decimal"
-                                           ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="17" Grid.Column="0"
@@ -502,7 +484,6 @@
                                            Value="{Binding RecoilReduction}"
                                            Interval="{Binding RecoilReductionInterval}"
                                            NumericInputMode="Decimal"
-                                           ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="18" Grid.Column="0"
@@ -515,7 +496,6 @@
                                            Value="{Binding ReloadSpeed}"
                                            Interval="{Binding ReloadSpeedInterval}"
                                            NumericInputMode="Decimal"
-                                           ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="19" Grid.Column="0"
@@ -528,7 +508,6 @@
                                            Value="{Binding ElementalChance}"
                                            Interval="{Binding ElementalChanceInterval}"
                                            NumericInputMode="Decimal"
-                                           ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
 
                         <TextBlock Grid.Row="20" Grid.Column="0"
@@ -541,7 +520,6 @@
                                            Value="{Binding ElementalDamage}"
                                            Interval="{Binding ElementalDamageInterval}"
                                            NumericInputMode="Decimal"
-                                           ParsingNumberStyle="Number" 
                                            StringFormat="F1" />
                         
                         <TextBlock Grid.Row="21" Grid.Column="0"
@@ -554,7 +532,6 @@
                                            Value="{Binding CritDamage}"
                                            Interval="{Binding CritDamageInterval}"
                                            NumericInputMode="Decimal"
-                                           ParsingNumberStyle="Number" 
                                            StringFormat="F1"/>
                     </Grid>
                 </ScrollViewer>
