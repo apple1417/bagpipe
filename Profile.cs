@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Buffers.Binary;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -134,7 +134,10 @@ namespace bagpipe {
         }
 
         if (ms.Position != ms.Length) {
-          unknownData = true;
+          // Allow trailing zero padding, warn on anything else
+          if (ms.ReadByteArray((int)(ms.Length - ms.Position)).Any(x => x != 0)) {
+            unknownData = true;
+          }
         }
       }
 
