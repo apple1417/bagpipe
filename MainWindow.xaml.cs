@@ -42,14 +42,23 @@ namespace bagpipe {
       Filter = "Profile Files|profile.bin;Player.wsg"
     };
 
-    private void OpenButton_Click(object sender, RoutedEventArgs e) {
+    private async void OpenButton_Click(object sender, RoutedEventArgs e) {
       openDialog.FileName = "";
       bool? ok = openDialog.ShowDialog();
       if (ok.HasValue && ok.Value) {
-        // TODO: processing dialog
+        ProgressRingDialog progress = new ProgressRingDialog(this);
+        MetroDialogSettings progressSettings = new MetroDialogSettings() {
+          AnimateShow = false,
+          AnimateHide = false,
+          OwnerCanCloseWithDialog = true,
+        };
+
+        await this.ShowMetroDialogAsync(progress, progressSettings);
         bool warn = profile.Load(openDialog.FileName);
+        await this.HideMetroDialogAsync(progress, progressSettings);
+
         if (warn) {
-          _ = this.ShowMessageAsync(
+          await this.ShowMessageAsync(
             "Warning",
             "Unexpected data was encountered while loading the profile. This may have caused some values to be intepreted incorrectly."
           );
@@ -61,31 +70,53 @@ namespace bagpipe {
       saveDialog.FileName = "";
       bool? ok = saveDialog.ShowDialog();
       if (ok.HasValue && ok.Value) {
-        // TODO: processing dialog
+        ProgressRingDialog progress = new ProgressRingDialog(this);
+        MetroDialogSettings progressSettings = new MetroDialogSettings() {
+          AnimateShow = false,
+          AnimateHide = false,
+          OwnerCanCloseWithDialog = true,
+        };
 
-        if (profile.IsOverSizeLimit()) {
+        await this.ShowMetroDialogAsync(progress, progressSettings);
+        bool isOverSizeLimit = profile.IsOverSizeLimit();
+
+        if (isOverSizeLimit) {
+          await this.HideMetroDialogAsync(progress, progressSettings);
+
           MessageDialogResult res = await this.ShowMessageAsync(
             "Warning",
             "This profile contains over 9000 bytes of raw data, which may make the game read it as corrupt. Do you want to continue?",
             MessageDialogStyle.AffirmativeAndNegative,
             new MetroDialogSettings() {
               AffirmativeButtonText = "Yes",
-              NegativeButtonText = "No"
+              NegativeButtonText = "No",
+              OwnerCanCloseWithDialog = true,
             }
           );
           if (res != MessageDialogResult.Affirmative) {
             return;
           }
+
+          await this.ShowMetroDialogAsync(progress, progressSettings);
         }
 
         profile.Save(saveDialog.FileName);
+        await this.HideMetroDialogAsync(progress, progressSettings);
       }
     }
     #endregion
 
     #region Entry Manipulation
     private async void NewButton_Click(object sender, RoutedEventArgs e) {
-      NewEntryDialog dialog = new NewEntryDialog(((ProfileViewModel)DataContext).DisplayGame);
+      NewEntryDialog dialog = new NewEntryDialog(
+        this,
+        new MetroDialogSettings() {
+          AffirmativeButtonText = "Yes",
+          NegativeButtonText = "No",
+          OwnerCanCloseWithDialog = true,
+        },
+        ((ProfileViewModel)DataContext).DisplayGame
+      );
       await this.ShowMetroDialogAsync(dialog);
 
       ProfileEntry entry = await dialog.GetCreatedEntry();

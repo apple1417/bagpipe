@@ -1,4 +1,5 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+﻿using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,7 +16,7 @@ namespace bagpipe {
     private TaskCompletionSource<ProfileEntry> tcs;
     internal Task<ProfileEntry> GetCreatedEntry() => tcs.Task;
 
-    internal NewEntryDialog(Game DisplayGame) : base(null, null) {
+    internal NewEntryDialog(MetroWindow parentWindow, MetroDialogSettings settings, Game DisplayGame) : base(parentWindow, settings) {
       InitializeComponent();
 
       Title = "New Profile Entry";
