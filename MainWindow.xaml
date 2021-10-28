@@ -651,7 +651,8 @@
                       HorizontalAlignment="Left" VerticalAlignment="Bottom"
                       ItemsSource="{Binding Source={StaticResource GameEnumValues},
                                             Mode=OneTime}"
-                      SelectedValue="{Binding DisplayGame}" />
+                      SelectedValue="{Binding DisplayGame}"
+                      ToolTip="This is visual only, it won't affect your profile." />
             <Button DockPanel.Dock="Right"
                     Content="Save"
                     Height="27.3"
