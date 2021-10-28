@@ -12,7 +12,7 @@ namespace bagpipe {
     public event PropertyChangedEventHandler PropertyChanged;
     public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
-    private Dictionary<string, List<string>> knownErrors = new Dictionary<string, List<string>>();
+    private readonly Dictionary<string, List<string>> knownErrors = new Dictionary<string, List<string>>();
 
     protected void SetProperty<T>(ref T field, T value, [CallerMemberName]string property = null) {
       if (property == null) {

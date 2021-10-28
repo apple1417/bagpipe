@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Text;
 
 namespace bagpipe {
@@ -14,11 +13,11 @@ namespace bagpipe {
 
     public static readonly double MAX_REWARD = ApplyDiminishingReturns(int.MaxValue);
 
-    private List<int> pointValues;
+    private readonly List<int> pointValues;
 
     public bool InUpdate { get; private set; } = false;
 
-    private ProfileEntryViewModel entry;
+    private readonly ProfileEntryViewModel entry;
     public BARRewards(ProfileEntryViewModel entry) {
       this.entry = entry;
 

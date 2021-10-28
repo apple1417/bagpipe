@@ -11,9 +11,9 @@ using System.Windows.Input;
 
 namespace bagpipe {
   public partial class NewEntryDialog : CustomDialog {
-    private ProfileEntry entry;
+    private readonly ProfileEntry entry;
 
-    private TaskCompletionSource<ProfileEntry> tcs;
+    private readonly TaskCompletionSource<ProfileEntry> tcs;
     internal Task<ProfileEntry> GetCreatedEntry() => tcs.Task;
 
     internal NewEntryDialog(MetroWindow parentWindow, MetroDialogSettings settings, Game DisplayGame) : base(parentWindow, settings) {
@@ -75,7 +75,7 @@ namespace bagpipe {
       );
 
       private readonly ProfileEntry Entry;
-      private ComboBox PresetComboBox;
+      private readonly ComboBox PresetComboBox;
       public NewEntryViewModel(ProfileEntry Entry, Game DisplayGame, ComboBox PresetComboBox) {
         this.Entry = Entry;
         this.PresetComboBox = PresetComboBox;

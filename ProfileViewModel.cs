@@ -108,7 +108,7 @@ namespace bagpipe {
     #endregion
 
     #region Watched Entry Updates
-    private Dictionary<KnownSettingInfo, PropertyChangedEventHandler> watchedEntryCallbacks = new Dictionary<KnownSettingInfo, PropertyChangedEventHandler>();
+    private readonly Dictionary<KnownSettingInfo, PropertyChangedEventHandler> watchedEntryCallbacks = new Dictionary<KnownSettingInfo, PropertyChangedEventHandler>();
 
     private void UpdateWatchedEntries() {
       void UpdateWatchedEntry(KnownSettingInfo known, ref ProfileEntryViewModel entry, string property) {
