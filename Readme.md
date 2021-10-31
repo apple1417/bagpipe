@@ -1,8 +1,7 @@
 # Borderlands Advanced Gadget to Permit Interesting Profile Edits
 Totally not a forced acronym.
 
-### [Requires Dotnet Core](https://dotnet.microsoft.com/download/dotnet/3.1/runtime)
-&nbsp;
+### [Requires .NET Core x86 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-3.1.20-windows-x86-installer)
 
 Profile editor for Borderlands 1, 2, TPS, and BL1 Enhanced. On top of the standard edits, also
 allows editing in the raw data format all four games use.
