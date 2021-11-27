@@ -199,8 +199,18 @@
                                 IsEnabled="{Binding HasCustomizations}"
                                 Click="LockCustomizations_Click" />
 
-                        <TextBlock Grid.Row="1" Grid.Column="0"
-                                   Text="Golden Keys" />
+                        <TextBlock Grid.Row="1" Grid.Column="0">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock" BasedOn="{mah:StaticResource MahApps.Styles.TextBlock}">
+                                    <Setter Property="Text" Value="Golden Keys" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding DisplayGame}" Value="{x:Static local:Game.AoDK}">
+                                            <Setter Property="Text" Value="Skeleton Keys" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                         <mah:NumericUpDown Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
                                            Margin="0,0,0,6"
                                            Minimum="0"

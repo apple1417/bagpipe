@@ -3,8 +3,8 @@ Totally not a forced acronym.
 
 ### [Requires .NET Core x86 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-3.1.20-windows-x86-installer)
 
-Profile editor for Borderlands 1, 2, TPS, and BL1 Enhanced. On top of the standard edits, also
-allows editing in the raw data format all four games use.
+Profile editor for Borderlands 1, 2, TPS, BL1 Enhanced, and Assault on Dragon Keep Standalone. On
+top of the standard edits, also allows editing in the raw data format all five games use.
 
 ![Image](https://i.imgur.com/G9CXiG3.png)
 

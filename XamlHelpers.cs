@@ -171,6 +171,7 @@ namespace bagpipe {
       switch (game) {
         case Game.BL1:
         case Game.BL1E: prefix = "BL1("; break;
+        case Game.AoDK:  // Not sure this will stick but seems best for now
         case Game.BL2: prefix = "BL2("; break;
         case Game.TPS: prefix = "BLOZ("; break;
       };

@@ -30,6 +30,7 @@
     BL1E,
     BL2,
     TPS,
+    AoDK,
   }
 
   public enum BARRewardStat {

@@ -24,16 +24,21 @@ Note that if the decompressed data size goes over 9000 bytes, the games intepret
 corrupt. Practically, this will never happen, it's only a concern when creating your own files.
 
 ## Decompressed Data
-The decompressed data consits of a number of entries. The first four bytes hold the entry count.
+The decompressed data is formatted as follows.
 
 | Size | Description |
 |---:|:---|
 | 4 | The amount of profile entries in the file |
+| Variable | Profile entries |
+| 1 | AoDK Magic - 0x01 |
 
-Each entry is then appended one after the other. There may be padding after the stored amount of
-entries, but this is ignored.
+AoDK requires the byte after the last profile entry to be 0x01, and for there to be no further
+trailing data. All the other games accept any trailing data after the last entry, simply ignoring
+it (and trimming it on next write). Writing the 0x01 in all cases guarenteeds your file will work
+with all games.
 
-Each entry has the following format.
+Within the entries section, each entry is simply appended one after the other. Each entry has the
+following format.
 
 | Size | Description |
 |---:|:---|

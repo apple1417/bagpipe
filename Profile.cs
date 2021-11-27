@@ -134,8 +134,23 @@ namespace bagpipe {
         }
 
         if (ms.Position != ms.Length) {
-          // Allow trailing zero padding, warn on anything else
-          if (ms.ReadByteArray((int)(ms.Length - ms.Position)).Any(x => x != 0)) {
+          bool allowed = false;
+
+          // Allow a single trailing 1 (AoDK magic)
+          if (ms.Length - ms.Position == 1) {
+            int val = ms.ReadByte();
+            if (val == 1) {
+              allowed = true;
+              // Don't reset position so the zero padding check doesn't include it
+            } else {
+              ms.Position--;
+            }
+          }
+
+          // Allow trailing zero padding
+          allowed |= ms.ReadByteArray((int)(ms.Length - ms.Position)).All(x => x == 0);
+
+          if (!allowed) {
             unknownData = true;
           }
         }
@@ -213,7 +228,9 @@ namespace bagpipe {
           ms.WriteByte((byte)entry.AdvertisementType);
         }
 
-        return ms.GetBuffer();
+        ms.WriteByte(1);
+
+        return ms.ToArray();
       }
     }
 

@@ -67,6 +67,10 @@ namespace bagpipe {
           DisplayGame = Game.TPS;
           return;
         }
+        case "Tiny Tina's Assault On Dragon Keep": {
+          DisplayGame = Game.AoDK;
+          return;
+        }
         default: {
           break;
         }
@@ -89,17 +93,22 @@ namespace bagpipe {
         } else if (version <= 66) {
           DisplayGame = Game.BL2;
           return;
+        } else if (version <= 70) {
+          DisplayGame = Game.AoDK;
+          return;
         } else if (version <= 72) {
           DisplayGame = Game.TPS;
           return;
         }
       }
 
-      if (!profile.Entries.Any(e => e.ID == 129)) { // PlayerFOV (bl2, tps) / FOV (bl1e)
+      if (!profile.Entries.Any(e => e.ID == 129)) { // PlayerFOV (bl2, tps, aodk) / FOV (bl1e)
         DisplayGame = Game.BL1;
       } else if (profile.Entries.Any(e => e.ID == 126)) { // ShowCompass
         DisplayGame = Game.BL1E;
       } else if (profile.Entries.Any(e => e.ID == 168)) { // ResetCameraOnSlam
+        DisplayGame = Game.TPS;
+      } else if (profile.Entries.Any(e => e.ID == 170)) { // ShowSubtitleBackground
         DisplayGame = Game.TPS;
       } else {
         DisplayGame = Game.BL2;
